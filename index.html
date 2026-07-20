@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-78970079-c528-4f69-88c8-953f1488e00f/styles.css">
+<script src="_ds/industry-78970079-c528-4f69-88c8-953f1488e00f/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<style>
+:root{
+  --color-bg:#1f1f1f;
+  --color-surface:#2b2b2b;
+  --color-text:#f0f1ee;
+  --color-accent:#8bc43f;
+  --color-accent-600:#79ab34;
+  --color-accent-700:#658f2b;
+  --color-divider:color-mix(in srgb,#eef1ec 18%, transparent);
+  --edge:clamp(20px,5vw,64px);
+}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@keyframes jrcRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+a{color:var(--color-accent)}
+/* Show real photography — drop the accent "duotone" wash the design system puts over images */
+.duotone::after{display:none}
+/* Responsive layout — the fixed multi-column grids below overflow narrow screens.
+   minmax(0,1fr) lets columns shrink; breakpoints reduce the column count. */
+.jrc-trust{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.jrc-services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.jrc-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.jrc-reviews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.jrc-about-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)}
+.jrc-cta{display:grid;grid-template-columns:minmax(0,1fr) auto}
+.jrc-footer{display:grid;grid-template-columns:1.4fr 1fr 1fr}
+@media (max-width:900px){
+  .jrc-trust{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .jrc-services{grid-template-columns:1fr}
+  .jrc-reviews{grid-template-columns:1fr}
+  .jrc-about-grid{grid-template-columns:1fr}
+  .jrc-cta{grid-template-columns:1fr}
+  .jrc-footer{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .jrc-trust{grid-template-columns:1fr}
+  .jrc-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Quote wizard: content + estimate rail stack on narrow screens */
+.jrc-wiz{display:grid;grid-template-columns:minmax(0,1fr) 300px}
+.jrc-contact-grid{display:grid;grid-template-columns:1fr 1fr}
+@media (max-width:900px){
+  .jrc-wiz{grid-template-columns:1fr}
+  .jrc-wiz aside{position:static !important;order:-1}
+  .jrc-contact-grid{grid-template-columns:1fr}
+  .jrc-navlink{display:none}
+}
+@media (max-width:520px){
+  .jrc-navphone{display:none}
+}
+</style>
+</helmet>
+
+<nav style="position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--color-bg) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--color-divider)">
+  <div style="max-width:1240px;margin:0 auto;padding:12px var(--edge);display:flex;align-items:center;gap:22px">
+    <a href="#top" style="display:flex;align-items:center;text-decoration:none;color:inherit;margin-right:auto">
+      <img src="assets/jrc-logo.png" alt="JRC Fencing Gold Coast" style="height:104px;width:auto;display:block;margin:-24px 0" />
+    </a>
+    <a class="jrc-navlink" href="#services" style="text-decoration:none;color:inherit;font-size:14px;letter-spacing:.02em">Services</a>
+    <a class="jrc-navlink" href="#about" style="text-decoration:none;color:inherit;font-size:14px;letter-spacing:.02em">About</a>
+    <a class="jrc-navlink" href="#gallery" style="text-decoration:none;color:inherit;font-size:14px;letter-spacing:.02em">Gallery</a>
+    <a class="jrc-navlink" href="#reviews" style="text-decoration:none;color:inherit;font-size:14px;letter-spacing:.02em">Reviews</a>
+    <a href="measure-up.html" style="text-decoration:none;color:var(--color-accent);font-size:14px;letter-spacing:.02em;white-space:nowrap">3D Measure Up</a>
+    <a class="jrc-navphone" href="tel:0405785072" style="text-decoration:none;color:inherit;font-size:14px;letter-spacing:.03em;font-family:var(--font-heading);font-weight:600;white-space:nowrap">0405 785 072</a>
+    <button type="button" class="btn btn-primary" onClick="{{ openQuote }}">Get a free quote</button>
+  </div>
+</nav>
+
+<div id="top"></div>
+
+<!-- ============ HERO ============ -->
+<section style="position:relative;overflow:hidden;border-bottom:1px solid var(--color-divider);min-height:clamp(540px,84vh,880px);display:flex;align-items:center">
+  <img src="assets/4FD49B26-DD6B-4DEC-830D-CEE4D7AD4083.avif" alt="Timber fence built by JRC Fencing on the Gold Coast" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center" />
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--color-bg) 94%,transparent) 0%,color-mix(in srgb,var(--color-bg) 80%,transparent) 46%,color-mix(in srgb,var(--color-bg) 34%,transparent) 100%)"></div>
+  <div style="position:absolute;inset:0;background-image:linear-gradient(var(--color-divider) 1px,transparent 1px),linear-gradient(90deg,var(--color-divider) 1px,transparent 1px);background-size:46px 46px;opacity:.35;pointer-events:none"></div>
+  <div style="position:relative;width:100%;max-width:1240px;margin:0 auto;padding:clamp(56px,9vw,120px) var(--edge)">
+    <div style="max-width:680px;animation:jrcRise .6s ease both">
+      <div style="display:inline-flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:22px">
+        <span style="width:26px;height:1px;background:var(--color-accent)"></span>Gold Coast &amp; Tweed · Est. 10+ years</div>
+      <h1 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(44px,6.4vw,88px);line-height:1.02;letter-spacing:-.01em;text-transform:uppercase;margin:0">
+        <span style="display:block">Fencing done</span>
+        <span style="display:block">properly, <span style="color:var(--color-accent)">first time.</span></span></h1>
+      <p style="font-size:17px;line-height:1.6;max-width:52ch;margin:24px 0 0;color:color-mix(in srgb,var(--color-text) 88%,transparent)">
+        Timber, Colorbond and rural fencing built by the Gold Coast&rsquo;s trusted specialists. Get a clear indicative price in under a minute&mdash;then a free, exact on-site quote.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px">
+        <button type="button" class="btn btn-primary" style="font-size:15px;padding:12px 22px" onClick="{{ openQuote }}">Start my quote</button>
+        <a href="tel:0405785072" class="btn btn-secondary" style="font-size:15px;padding:12px 22px;text-decoration:none">Call 0405 785 072</a>
+        <a href="measure-up.html" class="btn btn-ghost" style="font-size:15px;padding:12px 22px;text-decoration:none">Measure up in 3D &rarr;</a>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:30px">
+        <span class="tag tag-outline">Fully licensed &amp; insured</span>
+        <span class="tag tag-outline">4.9&#9733; on Google</span>
+        <span class="tag tag-outline">Free, no-obligation quotes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY CHOOSE US ============ -->
+<section style="border-bottom:1px solid var(--color-divider)">
+  <div class="jrc-trust" style="max-width:1240px;margin:0 auto;padding:0 var(--edge)">
+    <sc-for list="{{ trust }}" as="t" hint-placeholder-count="4">
+      <div style="padding:30px clamp(16px,2.2vw,28px);border-left:1px solid var(--color-divider)">
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:30px;color:var(--color-accent);line-height:1">{{ t.stat }}</div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:15px;letter-spacing:.02em;margin-top:10px">{{ t.title }}</div>
+        <div style="font-size:13px;line-height:1.5;margin-top:6px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ t.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" style="padding:clamp(56px,7vw,96px) 0;border-bottom:1px solid var(--color-divider)">
+  <div style="max-width:1240px;margin:0 auto;padding:0 var(--edge)">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:34px">
+      <div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:10px">01 · What we build</div>
+        <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(30px,4vw,46px);letter-spacing:-.01em;text-transform:uppercase;margin:0">Three ways to close a boundary</h2>
+      </div>
+      <p style="font-size:15px;line-height:1.6;max-width:38ch;margin:0;color:color-mix(in srgb,var(--color-text) 72%,transparent)">Prices shown are indicative supply &amp; install ranges for the Gold Coast. Your on-site quote is free and exact.</p>
+    </div>
+    <div class="jrc-services" style="gap:clamp(18px,2.5vw,30px)">
+      <sc-for list="{{ services }}" as="s" hint-placeholder-count="3">
+        <div style="position:relative;border:1px solid var(--color-divider);padding:26px 24px 28px;display:flex;flex-direction:column">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <figure class="blueprint duotone" style="margin:0 0 20px;aspect-ratio:16/10">
+            <image-slot id="{{ s.slot }}" shape="rect" src="{{ s.src }}" placeholder="{{ s.ph }}"></image-slot>
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          </figure>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent)">{{ s.from }}</div>
+          <h3 style="font-family:var(--font-heading);font-weight:600;font-size:25px;text-transform:uppercase;margin:6px 0 0">{{ s.title }}</h3>
+          <p style="font-size:14px;line-height:1.6;margin:10px 0 22px;color:color-mix(in srgb,var(--color-text) 74%,transparent);flex:1">{{ s.body }}</p>
+          <button type="button" class="btn btn-secondary btn-block" onClick="{{ s.onQuote }}">Free quote &rarr;</button>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" style="padding:clamp(56px,7vw,96px) 0;border-bottom:1px solid var(--color-divider)">
+  <div class="jrc-about-grid" style="max-width:1240px;margin:0 auto;padding:0 var(--edge);gap:clamp(32px,5vw,72px);align-items:center">
+    <figure class="blueprint duotone" style="margin:0;aspect-ratio:1/1">
+      <image-slot id="jrc-about" shape="rect" src="assets/252311_c9bde9fcacbd4aab9e9ba84b090698d1~mv2.avif" placeholder="Drop a photo of the crew / a finished fence"></image-slot>
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    </figure>
+    <div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:12px">02 · Who we are</div>
+      <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(28px,3.6vw,42px);letter-spacing:-.01em;text-transform:uppercase;margin:0">The Gold Coast&rsquo;s trusted fencing specialists</h2>
+      <p style="font-size:16px;line-height:1.7;margin:20px 0 0;color:color-mix(in srgb,var(--color-text) 84%,transparent)">With over ten years&rsquo; combined experience, JRC Fencing delivers durable, stylish fencing for homes and businesses across the Gold Coast and Tweed. Premium materials, expert craftsmanship, and tidy sites&mdash;every time.</p>
+      <p style="font-size:16px;line-height:1.7;margin:14px 0 0;color:color-mix(in srgb,var(--color-text) 84%,transparent)">From the first consultation to the final panel, we work to the highest standard and leave the job cleaner than we found it. That&rsquo;s why our clients recommend us to their friends and family.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:26px;margin-top:26px">
+        <div><div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent)">Licence · QBCC</div><div style="font-family:var(--font-heading);font-size:20px;margin-top:4px">15495053</div></div>
+        <div style="border-left:1px solid var(--color-divider);padding-left:26px"><div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent)">Licence · NSW</div><div style="font-family:var(--font-heading);font-size:20px;margin-top:4px">473160C</div></div>
+        <div style="border-left:1px solid var(--color-divider);padding-left:26px"><div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent)">Rated</div><div style="font-family:var(--font-heading);font-size:20px;margin-top:4px">4.9&#9733; Google</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section id="gallery" style="padding:clamp(56px,7vw,96px) 0;border-bottom:1px solid var(--color-divider)">
+  <div style="max-width:1240px;margin:0 auto;padding:0 var(--edge)">
+    <div style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:10px">03 · Recent work</div>
+    <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(30px,4vw,46px);letter-spacing:-.01em;text-transform:uppercase;margin:0 0 30px">A boundary we&rsquo;re proud of</h2>
+    <div class="jrc-gallery" style="gap:clamp(14px,2vw,24px)">
+      <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="6">
+        <figure class="blueprint duotone" style="margin:0;aspect-ratio:1/1">
+          <image-slot id="{{ g.slot }}" shape="rect" src="{{ g.src }}" placeholder="{{ g.ph }}"></image-slot>
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </figure>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section id="reviews" style="padding:clamp(56px,7vw,96px) 0;border-bottom:1px solid var(--color-divider)">
+  <div style="max-width:1240px;margin:0 auto;padding:0 var(--edge)">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:34px">
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent)">04 · What clients say</div>
+      <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+      <span style="font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--color-accent)">4.9&#9733; average</span>
+    </div>
+    <div class="jrc-reviews" style="gap:clamp(18px,2.5vw,30px)">
+      <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+        <figure style="position:relative;border:1px solid var(--color-divider);padding:26px 24px;margin:0;display:flex;flex-direction:column;gap:16px">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="color:var(--color-accent);letter-spacing:.18em;font-size:14px">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote style="margin:0;font-size:15px;line-height:1.62;color:color-mix(in srgb,var(--color-text) 90%,transparent)">{{ r.quote }}</blockquote>
+          <figcaption style="font-family:var(--font-heading);font-weight:600;font-size:14px;letter-spacing:.03em;margin-top:auto">{{ r.name }}</figcaption>
+        </figure>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA / CONTACT ============ -->
+<section id="contact" style="position:relative;overflow:hidden;background:var(--color-accent-700)">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(color-mix(in srgb,#fff 12%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,#fff 12%,transparent) 1px,transparent 1px);background-size:46px 46px;pointer-events:none"></div>
+  <div class="jrc-cta" style="position:relative;max-width:1240px;margin:0 auto;padding:clamp(52px,6vw,84px) var(--edge);gap:32px;align-items:center">
+    <div>
+      <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(30px,4.4vw,52px);letter-spacing:-.01em;text-transform:uppercase;margin:0;color:#fff">Ready for a straight answer on price?</h2>
+      <p style="font-size:16px;line-height:1.6;margin:16px 0 0;max-width:54ch;color:color-mix(in srgb,#fff 88%,transparent)">Answer five quick questions for an indicative range, then we&rsquo;ll lock in a free on-site measure. No pressure, no obligation.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button type="button" class="btn" style="background:#fff;color:var(--color-accent-700);border-color:#fff;font-size:16px;padding:14px 28px" onClick="{{ openQuote }}">Start my quote &rarr;</button>
+      <a href="tel:0405785072" class="btn" style="border-color:color-mix(in srgb,#fff 60%,transparent);color:#fff;font-size:15px;padding:12px 28px;text-decoration:none">Call 0405 785 072</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer style="padding:52px 0 40px">
+  <div class="jrc-footer" style="max-width:1240px;margin:0 auto;padding:0 var(--edge);gap:32px;align-items:start">
+    <div>
+      <img src="assets/jrc-logo.png" alt="JRC Fencing Gold Coast" style="height:64px;width:auto;display:block;margin-bottom:14px" />
+      <p style="font-size:14px;line-height:1.6;max-width:40ch;color:color-mix(in srgb,var(--color-text) 66%,transparent);margin:0">Timber, Colorbond &amp; rural fencing across the Gold Coast and Tweed. Fully licensed and insured.</p>
+    </div>
+    <div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:12px">Contact</div>
+      <a href="tel:0405785072" style="display:block;font-size:14px;color:inherit;text-decoration:none;margin-bottom:6px">0405 785 072</a>
+      <a href="mailto:jrcfencing@outlook.com" style="display:block;font-size:14px;color:inherit;text-decoration:none;margin-bottom:6px">jrcfencing@outlook.com</a>
+      <div style="font-size:14px;color:color-mix(in srgb,var(--color-text) 66%,transparent)">Gold Coast &amp; Tweed, QLD/NSW</div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:12px">Licences</div>
+      <div style="font-size:14px;margin-bottom:6px">QBCC 15495053</div>
+      <div style="font-size:14px;margin-bottom:6px">NSW 473160C</div>
+      <button type="button" class="btn btn-secondary" style="margin-top:8px" onClick="{{ openQuote }}">Get a free quote</button>
+    </div>
+  </div>
+  <div style="max-width:1240px;margin:34px auto 0;padding:18px var(--edge) 0;border-top:1px solid var(--color-divider);font-size:12px;color:color-mix(in srgb,var(--color-text) 55%,transparent)">&copy; 2026 JRC Fencing. All rights reserved.</div>
+</footer>
+
+<!-- ============ QUOTE WIZARD OVERLAY ============ -->
+<sc-if value="{{ showQuote }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;z-index:200;background:var(--color-bg);overflow-y:auto">
+  <div style="position:sticky;top:0;z-index:2;background:color-mix(in srgb,var(--color-bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:1080px;margin:0 auto;padding:14px var(--edge);display:flex;align-items:center;gap:16px">
+      <span style="font-family:var(--font-heading);font-weight:600;font-size:17px;letter-spacing:.12em;margin-right:auto">JRC FENCING &mdash; FREE QUOTE</span>
+      <button type="button" class="btn btn-ghost" onClick="{{ closeQuote }}" aria-label="Close">Close &times;</button>
+    </div>
+  </div>
+
+  <div style="max-width:1080px;margin:0 auto;padding:clamp(24px,4vw,44px) var(--edge) 72px">
+    <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:640px;margin:24px auto;position:relative;border:1px solid var(--color-accent);padding:clamp(28px,5vw,48px);text-align:center">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div style="width:56px;height:56px;margin:0 auto 20px;border:1px solid var(--color-accent);display:grid;place-items:center;color:var(--color-accent);font-size:28px">&#10003;</div>
+        <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(28px,4vw,40px);text-transform:uppercase;margin:0">Request received</h2>
+        <p style="font-size:16px;line-height:1.6;margin:14px 0 0;color:color-mix(in srgb,var(--color-text) 82%,transparent)">Thanks {{ answers.name }} &mdash; we&rsquo;ll call you on {{ answers.phone }} within one business day to book your free on-site measure.</p>
+        <sc-if value="{{ estOk }}" hint-placeholder-val="{{ false }}">
+          <div style="margin:24px 0;padding:20px;border:1px solid var(--color-divider)">
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent)">Your indicative range</div>
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:clamp(34px,6vw,52px);line-height:1;margin-top:8px">{{ estLow }} &ndash; {{ estHigh }}</div>
+            <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 60%,transparent);margin-top:8px">{{ typeLabel }} · {{ styleLabel }} · {{ heightLabel }} · {{ lengthLabel }}</div>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+          <button type="button" class="btn btn-primary" onClick="{{ closeQuote }}">Back to site</button>
+          <button type="button" class="btn btn-secondary" onClick="{{ restart }}">Start another</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ true }}">
+      <!-- progress -->
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <sc-for list="{{ stepItems }}" as="st" hint-placeholder-count="5">
+          <div style="flex:1;height:3px;background:{{ st.bar }}"></div>
+        </sc-for>
+      </div>
+      <div style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent);margin-bottom:24px">Step {{ stepNo }} of 5 &mdash; {{ stepName }}</div>
+
+      <div class="jrc-wiz" style="gap:clamp(24px,4vw,48px);align-items:start">
+        <div>
+          <!-- STEP 0: TYPE -->
+          <sc-if value="{{ isType }}" hint-placeholder-val="{{ true }}">
+            <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(26px,3.4vw,36px);text-transform:uppercase;margin:0 0 6px">What type of fence?</h2>
+            <p style="font-size:15px;color:color-mix(in srgb,var(--color-text) 70%,transparent);margin:0 0 22px">Pick the material you&rsquo;re after. You can change it later.</p>
+            <div style="display:grid;gap:14px">
+              <sc-for list="{{ typeItems }}" as="t" hint-placeholder-count="3">
+                <button type="button" style="{{ t.style }}" onClick="{{ t.onClick }}">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <img src="{{ t.img }}" alt="" style="width:100%;aspect-ratio:16/5;object-fit:cover;display:block;margin-bottom:12px" />
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+                    <span style="font-family:var(--font-heading);font-weight:600;font-size:22px;text-transform:uppercase">{{ t.label }}</span>
+                    <span style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--color-accent)">{{ t.from }}</span>
+                  </div>
+                  <span style="font-size:14px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ t.desc }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- STEP 1: STYLE + HEIGHT -->
+          <sc-if value="{{ isStyle }}" hint-placeholder-val="{{ false }}">
+            <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(26px,3.4vw,36px);text-transform:uppercase;margin:0 0 6px">Style &amp; height</h2>
+            <p style="font-size:15px;color:color-mix(in srgb,var(--color-text) 70%,transparent);margin:0 0 22px">Choose a profile and finished height.</p>
+            <div style="display:grid;gap:12px;margin-bottom:28px">
+              <sc-for list="{{ styleItems }}" as="s" hint-placeholder-count="2">
+                <button type="button" style="{{ s.style }}" onClick="{{ s.onClick }}">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <span style="font-family:var(--font-heading);font-weight:600;font-size:19px;text-transform:uppercase">{{ s.label }}</span>
+                  <span style="font-size:13px;color:color-mix(in srgb,var(--color-text) 72%,transparent)">{{ s.desc }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ isColorbond }}" hint-placeholder-val="{{ false }}">
+              <div class="field" style="margin-bottom:28px">
+                <label>Colorbond colour</label>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+                  <sc-for list="{{ colourItems }}" as="c" hint-placeholder-count="6">
+                    <button type="button" title="{{ c.name }}" style="{{ c.style }}" onClick="{{ c.onClick }}"></button>
+                  </sc-for>
+                </div>
+                <div style="font-size:13px;margin-top:10px;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ colourName }}</div>
+              </div>
+            </sc-if>
+            <div class="field" style="margin-bottom:0">
+              <label>Finished height</label>
+              <div class="seg" style="flex-wrap:wrap">
+                <label class="seg-opt"><input type="radio" name="jrc-h" value="1.5" onChange="{{ onHeight }}" />1.5 m</label>
+                <label class="seg-opt"><input type="radio" name="jrc-h" value="1.8" onChange="{{ onHeight }}" />1.8 m</label>
+                <label class="seg-opt"><input type="radio" name="jrc-h" value="2.1" onChange="{{ onHeight }}" />2.1 m</label>
+                <label class="seg-opt"><input type="radio" name="jrc-h" value="2.4" onChange="{{ onHeight }}" />2.4 m</label>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- STEP 2: LENGTH -->
+          <sc-if value="{{ isLength }}" hint-placeholder-val="{{ false }}">
+            <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(26px,3.4vw,36px);text-transform:uppercase;margin:0 0 6px">How long is the fence?</h2>
+            <p style="font-size:15px;color:color-mix(in srgb,var(--color-text) 70%,transparent);margin:0 0 10px">A rough total in metres is fine &mdash; we confirm exact lengths on site.</p>
+            <a href="measure-up.html" style="display:inline-block;font-size:14px;color:var(--color-accent);margin:0 0 22px">Not sure? Draw your fence in our 3D measure-up tool &rarr;</a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+              <sc-for list="{{ lengthChips }}" as="c" hint-placeholder-count="4">
+                <button type="button" class="btn" style="{{ c.style }}" onClick="{{ c.onClick }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <div class="field" style="max-width:260px;margin-bottom:16px">
+              <label>Exact metres (optional)</label>
+              <input class="input" type="number" min="1" inputmode="numeric" placeholder="e.g. 24" value="{{ lengthValue }}" onInput="{{ onLength }}" />
+            </div>
+            <label class="radio" style="margin-bottom:26px"><input type="checkbox" checked="{{ answers.lengthUnsure }}" onChange="{{ toggleUnsure }}" /><span class="dot"></span>I&rsquo;m not sure &mdash; measure it for me</label>
+            <div class="field">
+              <label>Removing an old fence?</label>
+              <div class="seg">
+                <label class="seg-opt"><input type="radio" name="jrc-rm" value="yes" onChange="{{ onRemove }}" />Yes, remove &amp; dispose</label>
+                <label class="seg-opt"><input type="radio" name="jrc-rm" value="no" onChange="{{ onRemove }}" />No, clear line</label>
+              </div>
+            </div>
+            <div class="field" style="margin-top:18px;margin-bottom:0">
+              <label>Gates</label>
+              <sc-for list="{{ gateItems }}" as="g" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+                  <span style="flex:1;font-size:14px">{{ g.label }} <span style="color:color-mix(in srgb,var(--color-text) 55%,transparent);font-size:13px">{{ g.price }}</span></span>
+                  <button type="button" class="btn btn-secondary" style="padding:4px 13px;font-size:16px;line-height:1" onClick="{{ g.minus }}">&minus;</button>
+                  <span style="font-family:var(--font-heading);font-weight:600;font-size:17px;min-width:20px;text-align:center">{{ g.count }}</span>
+                  <button type="button" class="btn btn-secondary" style="padding:4px 13px;font-size:16px;line-height:1" onClick="{{ g.plus }}">+</button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- STEP 3: DETAILS -->
+          <sc-if value="{{ isDetails }}" hint-placeholder-val="{{ false }}">
+            <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(26px,3.4vw,36px);text-transform:uppercase;margin:0 0 6px">A few site details</h2>
+            <p style="font-size:15px;color:color-mix(in srgb,var(--color-text) 70%,transparent);margin:0 0 22px">Photos help us quote accurately without a visit.</p>
+            <div class="field"><label>Property type</label>
+              <div class="seg">
+                <label class="seg-opt"><input type="radio" name="jrc-pt" value="Residential" onChange="{{ onProperty }}" />Residential</label>
+                <label class="seg-opt"><input type="radio" name="jrc-pt" value="Commercial" onChange="{{ onProperty }}" />Commercial</label>
+                <label class="seg-opt"><input type="radio" name="jrc-pt" value="Rural / acreage" onChange="{{ onProperty }}" />Rural / acreage</label>
+              </div>
+            </div>
+            <div class="field" style="margin-top:18px"><label>Ground</label>
+              <div class="seg">
+                <label class="seg-opt"><input type="radio" name="jrc-gr" value="level" onChange="{{ onGround }}" />Mostly level</label>
+                <label class="seg-opt"><input type="radio" name="jrc-gr" value="sloped" onChange="{{ onGround }}" />Sloped / uneven</label>
+              </div>
+            </div>
+            <div class="field" style="margin-top:18px"><label>Photos of the fence line (optional)</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <figure class="blueprint duotone" style="margin:0;aspect-ratio:4/3"><image-slot id="jrc-q1" shape="rect" placeholder="Drop / tap to add a photo"></image-slot><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></figure>
+                <figure class="blueprint duotone" style="margin:0;aspect-ratio:4/3"><image-slot id="jrc-q2" shape="rect" placeholder="Add another (optional)"></image-slot><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></figure>
+              </div>
+            </div>
+            <div class="field" style="margin-top:18px"><label>Anything else we should know?</label>
+              <textarea class="input" placeholder="Gates, access, preferred colour, timing…" onInput="{{ onNotes }}">{{ answers.notes }}</textarea>
+            </div>
+          </sc-if>
+
+          <!-- STEP 4: CONTACT -->
+          <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+            <h2 style="font-family:var(--font-heading);font-weight:600;font-size:clamp(26px,3.4vw,36px);text-transform:uppercase;margin:0 0 6px">Where do we send it?</h2>
+            <p style="font-size:15px;color:color-mix(in srgb,var(--color-text) 70%,transparent);margin:0 0 22px">We&rsquo;ll confirm your free on-site measure by phone.</p>
+            <div class="jrc-contact-grid" style="gap:16px">
+              <div class="field"><label>Full name *</label><input class="input" type="text" value="{{ answers.name }}" onInput="{{ onName }}" placeholder="Your name" /></div>
+              <div class="field"><label>Phone *</label><input class="input" type="tel" value="{{ answers.phone }}" onInput="{{ onPhone }}" placeholder="04__ ___ ___" /></div>
+              <div class="field"><label>Email</label><input class="input" type="email" value="{{ answers.email }}" onInput="{{ onEmail }}" placeholder="you@example.com" /></div>
+              <div class="field"><label>Suburb *</label><input class="input" type="text" value="{{ answers.suburb }}" onInput="{{ onSuburb }}" placeholder="e.g. Varsity Lakes" /></div>
+            </div>
+            <div class="field" style="margin-top:16px"><label>Best time to call</label>
+              <div class="seg">
+                <label class="seg-opt"><input type="radio" name="jrc-bt" value="Morning" onChange="{{ onTime }}" />Morning</label>
+                <label class="seg-opt"><input type="radio" name="jrc-bt" value="Afternoon" onChange="{{ onTime }}" />Afternoon</label>
+                <label class="seg-opt"><input type="radio" name="jrc-bt" value="Anytime" onChange="{{ onTime }}" />Anytime</label>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- NAV -->
+          <div style="display:flex;gap:12px;margin-top:34px">
+            <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+              <button type="button" class="btn btn-secondary" onClick="{{ back }}">&larr; Back</button>
+            </sc-if>
+            <button type="button" class="btn btn-primary" style="margin-left:auto;font-size:15px;padding:12px 26px;{{ nextDisabledStyle }}" onClick="{{ next }}">{{ nextLabel }}</button>
+          </div>
+        </div>
+
+        <!-- ESTIMATE RAIL -->
+        <aside style="position:relative;border:1px solid var(--color-divider);padding:22px 20px;position:sticky;top:96px">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent)">Live estimate</div>
+          <sc-if value="{{ showEstimateNumber }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.05;margin-top:10px">{{ estLow }}<br><span style="color:color-mix(in srgb,var(--color-text) 55%,transparent);font-size:18px">to</span> {{ estHigh }}</div>
+          </sc-if>
+          <sc-if value="{{ hideEstimateNumber }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:14px;line-height:1.5;margin-top:12px;color:color-mix(in srgb,var(--color-text) 62%,transparent)">{{ estimatePrompt }}</div>
+          </sc-if>
+          <div style="height:1px;background:var(--color-divider);margin:18px 0"></div>
+          <dl style="margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:13px">
+            <dt style="color:color-mix(in srgb,var(--color-text) 55%,transparent)">Type</dt><dd style="margin:0;text-align:right;font-family:var(--font-heading);font-weight:600">{{ typeLabel }}</dd>
+            <dt style="color:color-mix(in srgb,var(--color-text) 55%,transparent)">Style</dt><dd style="margin:0;text-align:right;font-family:var(--font-heading);font-weight:600">{{ styleLabel }}</dd>
+            <dt style="color:color-mix(in srgb,var(--color-text) 55%,transparent)">Colour</dt><dd style="margin:0;text-align:right;font-family:var(--font-heading);font-weight:600">{{ colourLabel }}</dd>
+            <dt style="color:color-mix(in srgb,var(--color-text) 55%,transparent)">Height</dt><dd style="margin:0;text-align:right;font-family:var(--font-heading);font-weight:600">{{ heightLabel }}</dd>
+            <dt style="color:color-mix(in srgb,var(--color-text) 55%,transparent)">Length</dt><dd style="margin:0;text-align:right;font-family:var(--font-heading);font-weight:600">{{ lengthLabel }}</dd>
+            <dt style="color:color-mix(in srgb,var(--color-text) 55%,transparent)">Gates</dt><dd style="margin:0;text-align:right;font-family:var(--font-heading);font-weight:600">{{ gatesLabel }}</dd>
+          </dl>
+          <p style="font-size:11px;line-height:1.5;margin:18px 0 0;color:color-mix(in srgb,var(--color-text) 50%,transparent)">Indicative only. Your on-site quote is free, exact and no-obligation.</p>
+        </aside>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = (() => {
+    const s = {
+      showQuote: false,
+      submitted: false,
+      step: 0,
+      answers: {
+        type: null, style: null, height: '1.8',
+        length: null, lengthUnsure: false, remove: null,
+        property: null, ground: 'level', notes: '',
+        name: '', phone: '', email: '', suburb: '', time: '',
+        gates: { single: 0, double: 0 }, colour: 'Monument'
+      }
+    };
+    // Hand-off from the 3D measure-up tool: prefill type/style/height/length
+    // and drop the visitor straight into the wizard past the answered steps.
+    try {
+      const p = JSON.parse(localStorage.getItem('jrcMeasurePrefill') || 'null');
+      if (p && p.type) {
+        localStorage.removeItem('jrcMeasurePrefill');
+        Object.assign(s.answers, {
+          type: p.type, style: p.style || null, height: String(p.height || '1.8'),
+          length: p.length || null, lengthUnsure: !p.length
+        });
+        if (p.colour) s.answers.colour = p.colour;
+        if (location.hash === '#quote') {
+          s.showQuote = true; s.step = 2;
+          document.body.style.overflow = 'hidden';
+        }
+      }
+    } catch (e) {}
+    return s;
+  })();
+
+  STYLE_OPTS = {
+    timber: [
+      { id: 'single', label: 'Butted single paling', desc: 'Classic boundary fence', rate: [85, 110] },
+      { id: 'lapcap', label: 'Lapped & capped', desc: 'Premium — no gaps, capped top rail', rate: [105, 140] }
+    ],
+    colorbond: [
+      { id: 'standard', label: 'Standard Colorbond', desc: 'Steel sheet, 20+ colours', rate: [100, 150] },
+      { id: 'lattice', label: 'With lattice / slat top', desc: 'Extra height and privacy', rate: [135, 190] }
+    ],
+    rural: [
+      { id: 'postrail', label: 'Post & rail', desc: 'Timber rails, acreage look', rate: [45, 80] },
+      { id: 'postwire', label: 'Post & wire', desc: 'Stock and boundary fencing', rate: [30, 55] }
+    ]
+  };
+  HEIGHT_FACTORS = { '1.5': 0.9, '1.8': 1, '2.1': 1.15, '2.4': 1.3 };
+  GATE_RATES = { single: [450, 700], double: [950, 1500] };
+  COLOURS = [
+    { name: 'Monument', hex: '#323438' }, { name: 'Woodland Grey', hex: '#4a4b46' },
+    { name: 'Basalt', hex: '#686a6c' }, { name: 'Deep Ocean', hex: '#364152' },
+    { name: 'Surfmist', hex: '#e4e1d5' }, { name: 'Paperbark', hex: '#cbbfa8' }
+  ];
+  TYPE_META = {
+    timber: { label: 'Timber', from: 'from $95/m', desc: 'Hardwood posts, paling or lapped & capped.', img: 'assets/IMG_3350_edited.avif' },
+    colorbond: { label: 'Colorbond', from: 'from $110/m', desc: 'Low-maintenance steel in 20+ colours.', img: 'assets/252311_912fd575b297419ab1bc6e43db834a87~mv2.avif' },
+    rural: { label: 'Rural', from: 'from $45/m', desc: 'Post & rail or post & wire for acreage.', img: 'assets/252311_2924c106969f4cb4a94a915d77ae5373~mv2.avif' }
+  };
+  STEP_NAMES = ['Fence type', 'Style & height', 'Length', 'Site details', 'Your details'];
+
+  setA(patch) { this.setState(s => ({ answers: { ...s.answers, ...patch } })); }
+
+  openQuote = (type) => {
+    document.body.style.overflow = 'hidden';
+    this.setState(s => ({
+      showQuote: true, submitted: false,
+      step: typeof type === 'string' ? 1 : 0,
+      answers: typeof type === 'string' ? { ...s.answers, type, style: null } : s.answers
+    }));
+  };
+  closeQuote = () => { document.body.style.overflow = ''; this.setState({ showQuote: false }); };
+  restart = () => this.setState({
+    submitted: false, step: 0,
+    answers: { type: null, style: null, height: '1.8', length: null, lengthUnsure: false, remove: null, property: null, ground: 'level', notes: '', name: '', phone: '', email: '', suburb: '', time: '', gates: { single: 0, double: 0 }, colour: 'Monument' }
+  });
+
+  setType = (id) => this.setA({ type: id, style: null });
+  selectStyle = (id) => this.setA({ style: id });
+  setColour = (name) => this.setA({ colour: name });
+  bumpGate = (key, d) => this.setState(s => ({
+    answers: { ...s.answers, gates: { ...s.answers.gates, [key]: Math.max(0, Math.min(9, s.answers.gates[key] + d)) } }
+  }));
+  onHeight = (e) => this.setA({ height: e.target.value });
+  setLength = (n) => this.setA({ length: n, lengthUnsure: false });
+  onLength = (e) => this.setA({ length: e.target.value ? Number(e.target.value) : null, lengthUnsure: false });
+  toggleUnsure = (e) => this.setA({ lengthUnsure: e.target.checked });
+  onRemove = (e) => this.setA({ remove: e.target.value === 'yes' });
+  onProperty = (e) => this.setA({ property: e.target.value });
+  onGround = (e) => this.setA({ ground: e.target.value });
+  onNotes = (e) => this.setA({ notes: e.target.value });
+  onName = (e) => this.setA({ name: e.target.value });
+  onPhone = (e) => this.setA({ phone: e.target.value });
+  onEmail = (e) => this.setA({ email: e.target.value });
+  onSuburb = (e) => this.setA({ suburb: e.target.value });
+  onTime = (e) => this.setA({ time: e.target.value });
+
+  back = () => this.setState(s => ({ step: Math.max(0, s.step - 1) }));
+  next = () => {
+    if (!this.canNext()) return;
+    if (this.state.step >= 4) { document.body.style.overflow = ''; this.setState({ submitted: true }); }
+    else this.setState(s => ({ step: s.step + 1 }));
+  };
+
+  canNext() {
+    const a = this.state.answers, s = this.state.step;
+    if (s === 0) return !!a.type;
+    if (s === 1) return !!a.style && !!a.height;
+    if (s === 2) return a.lengthUnsure || (a.length > 0);
+    if (s === 3) return !!a.property;
+    if (s === 4) return a.name.trim() && a.phone.trim() && a.suburb.trim();
+    return true;
+  }
+
+  estimate() {
+    const a = this.state.answers;
+    const opt = (this.STYLE_OPTS[a.type] || []).find(o => o.id === a.style);
+    if (!opt || a.lengthUnsure || !a.length) return { ok: false };
+    const hf = this.HEIGHT_FACTORS[a.height] || 1;
+    const slope = a.ground === 'sloped' ? 1.08 : 1;
+    let low = a.length * opt.rate[0] * hf * slope;
+    let high = a.length * opt.rate[1] * hf * slope;
+    if (a.remove) { low += a.length * 18; high += a.length * 28; }
+    const g = a.gates || { single: 0, double: 0 };
+    low += g.single * this.GATE_RATES.single[0] + g.double * this.GATE_RATES.double[0];
+    high += g.single * this.GATE_RATES.single[1] + g.double * this.GATE_RATES.double[1];
+    const r = x => Math.round(x / 50) * 50;
+    return { ok: true, low: r(low), high: r(high) };
+  }
+
+  fmt(x) { return '$' + x.toLocaleString('en-AU'); }
+  cardStyle(active) {
+    return 'position:relative;display:flex;flex-direction:column;gap:6px;padding:18px 18px 20px;border:1px solid ' +
+      (active ? 'var(--color-accent)' : 'var(--color-divider)') + ';background:' +
+      (active ? 'color-mix(in srgb,var(--color-accent) 14%,transparent)' : 'transparent') +
+      ';cursor:pointer;text-align:left;color:inherit;font:inherit;transition:border-color .15s,background .15s;width:100%';
+  }
+  chipStyle(active) {
+    return 'font-size:14px;' + (active
+      ? 'background:var(--color-accent);color:var(--color-bg);border-color:var(--color-accent)'
+      : 'border-color:var(--color-divider)');
+  }
+
+  renderVals() {
+    const a = this.state.answers, step = this.state.step;
+    const est = this.estimate();
+    const styleOpts = this.STYLE_OPTS[a.type] || [];
+    const heightLabel = a.height ? a.height + ' m' : '—';
+    const lengthLabel = a.lengthUnsure ? 'Measure on site' : (a.length ? a.length + ' m' : '—');
+    const styleObj = styleOpts.find(o => o.id === a.style);
+    const canNext = this.canNext();
+
+    return {
+      // home data
+      trust: [
+        { stat: '10+', title: 'Years experience', sub: 'Combined across the crew' },
+        { stat: '4.9★', title: 'Google rated', sub: 'From local homeowners' },
+        { stat: '100%', title: 'Licensed & insured', sub: 'QBCC & NSW licensed' },
+        { stat: 'Free', title: 'No-obligation quotes', sub: 'On-site, exact pricing' }
+      ],
+      services: [
+        { title: 'Timber', from: 'from $95/m', slot: 'jrc-svc-timber', src: 'assets/IMG_3350_edited.avif', ph: 'Timber fence photo', body: 'Butted single paling or lapped & capped, on durable hardwood posts. Warm, classic, and built to last.', onQuote: () => this.openQuote('timber') },
+        { title: 'Colorbond', from: 'from $110/m', slot: 'jrc-svc-colorbond', src: 'assets/252311_912fd575b297419ab1bc6e43db834a87~mv2.avif', ph: 'Colorbond fence photo', body: 'A modern, low-maintenance steel fence in over twenty colours. Clean lines and total privacy.', onQuote: () => this.openQuote('colorbond') },
+        { title: 'Rural', from: 'from $45/m', slot: 'jrc-svc-rural', src: 'assets/252311_2924c106969f4cb4a94a915d77ae5373~mv2.avif', ph: 'Rural fence photo', body: 'Post & rail and post & wire options suited to acreage, paddocks and larger boundaries.', onQuote: () => this.openQuote('rural') }
+      ],
+      gallery: [
+        { slot: 'jrc-g1', src: 'assets/IMG_1458_HEIC.avif', ph: 'Recent job photo' }, { slot: 'jrc-g2', src: 'assets/IMG_2893_JPG.avif', ph: 'Recent job photo' },
+        { slot: 'jrc-g3', src: 'assets/IMG_3392_JPG.avif', ph: 'Recent job photo' }, { slot: 'jrc-g4', src: 'assets/IMG_3017_edited.avif', ph: 'Recent job photo' },
+        { slot: 'jrc-g5', src: 'assets/IMG_5338.avif', ph: 'Recent job photo' }, { slot: 'jrc-g6', src: 'assets/View%20recent%20photos.avif', ph: 'Recent job photo' }
+      ],
+      reviews: [
+        { name: 'Cheryl J.', quote: '“Robbie and Jaime were very professional. Their quote was very reasonable, the work was well done and they left the site clean. They went above and beyond — we&rsquo;d definitely recommend them.”' },
+        { name: 'Rafael M.', quote: '“The guys did an amazing job. Clear about what they were doing and when, on time, and delivered as agreed for the price. Promptly fixed a couple of minor things without complaint.”' },
+        { name: 'Maria D.', quote: '“Very professional. Completed the job very quickly, tidied up afterwards and were easy to communicate with. Highly recommend.”' }
+      ],
+      openQuote: this.openQuote,
+      closeQuote: this.closeQuote,
+      restart: this.restart,
+
+      // wizard state
+      showQuote: this.state.showQuote,
+      submitted: this.state.submitted,
+      formOpen: !this.state.submitted,
+      answers: a,
+      stepNo: step + 1,
+      stepName: this.STEP_NAMES[step],
+      stepItems: this.STEP_NAMES.map((_, i) => ({ bar: i <= step ? 'var(--color-accent)' : 'var(--color-divider)' })),
+      isType: step === 0, isStyle: step === 1, isLength: step === 2, isDetails: step === 3, isContact: step === 4,
+      canBack: step > 0,
+      nextLabel: step >= 4 ? 'Submit request' : 'Continue →',
+      nextDisabledStyle: canNext ? '' : 'opacity:.4;pointer-events:none',
+
+      typeItems: ['timber', 'colorbond', 'rural'].map(id => ({
+        label: this.TYPE_META[id].label, from: this.TYPE_META[id].from, desc: this.TYPE_META[id].desc,
+        img: this.TYPE_META[id].img,
+        style: this.cardStyle(a.type === id), onClick: () => this.setType(id)
+      })),
+      styleItems: styleOpts.map(o => ({
+        label: o.label, desc: o.desc, style: this.cardStyle(a.style === o.id), onClick: () => this.selectStyle(o.id)
+      })),
+      isColorbond: a.type === 'colorbond',
+      colourItems: this.COLOURS.map(c => ({
+        name: c.name,
+        style: 'width:38px;height:38px;padding:0;cursor:pointer;background:' + c.hex + ';border:2px solid ' +
+          (a.colour === c.name ? 'var(--color-accent)' : 'var(--color-divider)') +
+          (a.colour === c.name ? ';outline:1px solid var(--color-accent);outline-offset:2px' : ''),
+        onClick: () => this.setColour(c.name)
+      })),
+      colourName: a.colour,
+      gateItems: [
+        { key: 'single', label: 'Single gate', price: '+$450–700 ea' },
+        { key: 'double', label: 'Double / driveway gate', price: '+$950–1,500 ea' }
+      ].map(g => ({
+        label: g.label, price: g.price, count: a.gates[g.key],
+        minus: () => this.bumpGate(g.key, -1), plus: () => this.bumpGate(g.key, 1)
+      })),
+      onHeight: this.onHeight,
+      lengthChips: [10, 20, 30, 50].map(n => ({
+        label: n + ' m', style: this.chipStyle(!a.lengthUnsure && a.length === n), onClick: () => this.setLength(n)
+      })),
+      lengthValue: a.length || '',
+      onLength: this.onLength, toggleUnsure: this.toggleUnsure, onRemove: this.onRemove,
+      onProperty: this.onProperty, onGround: this.onGround, onNotes: this.onNotes,
+      onName: this.onName, onPhone: this.onPhone, onEmail: this.onEmail, onSuburb: this.onSuburb, onTime: this.onTime,
+      back: this.back, next: this.next,
+
+      // estimate rail
+      estOk: est.ok,
+      showEstimateNumber: est.ok,
+      hideEstimateNumber: !est.ok,
+      estLow: est.ok ? this.fmt(est.low) : '',
+      estHigh: est.ok ? this.fmt(est.high) : '',
+      estimatePrompt: a.lengthUnsure ? 'No worries — we&rsquo;ll measure on site and send an exact price.' : 'Pick a type, style and length to see your indicative range.',
+      typeLabel: a.type ? this.TYPE_META[a.type].label : '—',
+      styleLabel: styleObj ? styleObj.label : '—',
+      colourLabel: a.type === 'colorbond' ? a.colour : '—',
+      gatesLabel: (a.gates.single || a.gates.double)
+        ? [a.gates.single ? a.gates.single + '× single' : '', a.gates.double ? a.gates.double + '× double' : ''].filter(Boolean).join(', ')
+        : '—',
+      heightLabel, lengthLabel
+    };
+  }
+}
+</script>
+</body>
+</html>
