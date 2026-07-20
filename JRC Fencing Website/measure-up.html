@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Measure up your fence — JRC Fencing</title>
+<link rel="stylesheet" href="_ds/industry-78970079-c528-4f69-88c8-953f1488e00f/styles.css">
+<script type="importmap">{ "imports": { "three": "./assets/vendor/three.module.min.js" } }</script>
+<style>
+:root{
+  --color-bg:#1f1f1f;
+  --color-surface:#2b2b2b;
+  --color-text:#f0f1ee;
+  --color-accent:#8bc43f;
+  --color-accent-600:#79ab34;
+  --color-accent-700:#658f2b;
+  --color-divider:color-mix(in srgb,#eef1ec 18%, transparent);
+}
+*{box-sizing:border-box}
+html,body{height:100%;overscroll-behavior:none}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased;overflow:hidden;touch-action:pan-y}
+
+/* ── Shell ─────────────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh}
+header{display:flex;align-items:center;gap:18px;padding:10px 20px;border-bottom:1px solid var(--color-divider);background:color-mix(in srgb,var(--color-bg) 92%,transparent);z-index:5}
+header img{height:72px;width:auto;margin:-18px 0}
+header .crumbs{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+header .crumbs .c{display:flex;align-items:center;gap:8px;color:color-mix(in srgb,var(--color-text) 45%,transparent)}
+header .crumbs .c .n{width:22px;height:22px;border:1px solid currentColor;display:grid;place-items:center;font-size:11px}
+header .crumbs .c.active{color:var(--color-accent)}
+header .crumbs .c.done{color:color-mix(in srgb,var(--color-accent) 70%,transparent)}
+header .crumbs .sep{width:22px;height:1px;background:var(--color-divider)}
+header a.back{color:inherit;font-size:13px;text-decoration:none;opacity:.7;margin-left:18px}
+header a.back:hover{opacity:1}
+
+main{flex:1;display:flex;min-height:0;position:relative}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+aside{width:340px;flex:none;border-right:1px solid var(--color-divider);overflow-y:auto;padding:22px 20px 90px;position:relative;z-index:4;background:var(--color-bg)}
+aside h1{font-family:var(--font-heading);font-weight:600;font-size:26px;text-transform:uppercase;letter-spacing:-.01em;margin:0 0 4px}
+aside .kicker{font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:8px}
+aside p.lead{font-size:13.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 68%,transparent);margin:0 0 18px}
+.panel{display:none}
+.panel.active{display:block}
+
+.cardbtn{position:relative;width:100%;display:flex;flex-direction:column;gap:3px;padding:12px 14px;margin-bottom:10px;
+  border:1px solid var(--color-divider);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;
+  transition:border-color .15s, background .15s}
+.cardbtn:hover{border-color:color-mix(in srgb,var(--color-accent) 55%,transparent)}
+.cardbtn.sel{border-color:var(--color-accent);background:color-mix(in srgb,var(--color-accent) 13%,transparent)}
+.cardbtn .t{font-family:var(--font-heading);font-weight:600;font-size:17px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cardbtn .t .from{font-size:11px;letter-spacing:.06em;color:var(--color-accent)}
+.cardbtn .d{font-size:12.5px;color:color-mix(in srgb,var(--color-text) 65%,transparent)}
+
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.chip{padding:7px 13px;border:1px solid var(--color-divider);background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
+.chip:hover{border-color:color-mix(in srgb,var(--color-accent) 55%,transparent)}
+.chip.sel{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-bg);font-weight:600}
+
+.swatches{display:flex;flex-wrap:wrap;gap:9px;margin:6px 0 16px}
+.sw{width:34px;height:34px;border:2px solid transparent;outline:1px solid var(--color-divider);cursor:pointer;padding:0}
+.sw.sel{border-color:var(--color-bg);outline:2px solid var(--color-accent)}
+.swname{font-size:12px;color:color-mix(in srgb,var(--color-text) 68%,transparent);min-height:16px;margin:-8px 0 14px}
+
+label.side-lab{display:block;font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin:16px 0 8px}
+
+/* segment list */
+#segList{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.segrow{display:flex;align-items:center;gap:8px;font-size:13px}
+.segrow .nm{width:58px;color:color-mix(in srgb,var(--color-text) 60%,transparent)}
+.segrow input{width:74px;background:var(--color-surface);border:1px solid var(--color-divider);color:inherit;font:inherit;font-size:13px;padding:5px 8px}
+.segrow input:focus{outline:none;border-color:var(--color-accent)}
+.segrow .u{color:color-mix(in srgb,var(--color-text) 50%,transparent)}
+#segEmpty{font-size:13px;color:color-mix(in srgb,var(--color-text) 50%,transparent);border:1px dashed var(--color-divider);padding:14px;text-align:center}
+
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.summary dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:13px}
+.summary dt{color:color-mix(in srgb,var(--color-text) 55%,transparent)}
+.summary dd{margin:0;text-align:right;font-family:var(--font-heading);font-weight:600}
+
+/* ── Canvas area ───────────────────────────────────────── */
+#stage{flex:1;position:relative;min-width:0}
+#stage canvas{display:block;touch-action:none}
+.zoomctl{position:absolute;top:58px;right:14px;display:flex;flex-direction:column;gap:8px;z-index:5}
+.zoomctl button{width:42px;height:42px;font-size:20px;line-height:1;padding:0;touch-action:manipulation;
+  background:color-mix(in srgb,var(--color-bg) 85%,transparent);border:1px solid var(--color-divider);
+  color:var(--color-text);cursor:pointer}
+.zoomctl button:hover{border-color:var(--color-accent);color:var(--color-accent)}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.mlabel{position:absolute;transform:translate(-50%,-50%);font-family:var(--font-heading);font-weight:600;font-size:13px;letter-spacing:.03em;
+  background:color-mix(in srgb,var(--color-bg) 82%,transparent);border:1px solid color-mix(in srgb,var(--color-accent) 60%,transparent);
+  color:var(--color-accent);padding:2px 7px;white-space:nowrap}
+.mlabel.ghost{opacity:.75;border-style:dashed}
+#hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:12.5px;letter-spacing:.02em;
+  background:color-mix(in srgb,var(--color-bg) 80%,transparent);border:1px solid var(--color-divider);padding:7px 14px;pointer-events:none;white-space:nowrap}
+
+/* ── Estimate bar ──────────────────────────────────────── */
+#bar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:center;gap:22px;
+  padding:12px 20px;border-top:1px solid var(--color-divider);
+  background:color-mix(in srgb,var(--color-bg) 90%,transparent);backdrop-filter:blur(10px)}
+#bar .cell .k{font-family:var(--font-heading);font-weight:600;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 52%,transparent)}
+#bar .cell .v{font-family:var(--font-heading);font-weight:600;font-size:22px;line-height:1.1;margin-top:2px}
+#bar .cell .v em{font-style:normal;color:var(--color-accent)}
+#bar .spacer{flex:1}
+#bar .note{font-size:11px;color:color-mix(in srgb,var(--color-text) 45%,transparent);max-width:220px;line-height:1.4}
+
+@media (max-width: 860px){
+  aside{position:absolute;inset:auto 0 0 0;top:auto;width:100%;max-height:38vh;border-right:0;border-top:1px solid var(--color-divider);padding-bottom:110px}
+  #bar{position:fixed;gap:14px;flex-wrap:wrap}
+  #bar .note{display:none}
+  #bar .cell .v{font-size:17px}
+  header img{height:56px;margin:-12px 0}
+  header .crumbs .lbl{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <img src="assets/jrc-logo.png" alt="JRC Fencing">
+    <a class="back" href="JRC%20Fencing.dc.html">&larr; Back to site</a>
+    <div class="crumbs" id="crumbs">
+      <span class="c" data-s="0"><span class="n">1</span><span class="lbl">Draw</span></span>
+      <span class="sep"></span>
+      <span class="c" data-s="1"><span class="n">2</span><span class="lbl">Style</span></span>
+      <span class="sep"></span>
+      <span class="c" data-s="2"><span class="n">3</span><span class="lbl">Preview</span></span>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <!-- STEP 1 : DRAW -->
+      <section class="panel" id="panel0">
+        <div class="kicker">Step 1 · Measure up</div>
+        <h1>Draw your fence line</h1>
+        <p class="lead">Tap the plan to drop each corner of your fence, in order. Drag a corner to adjust it, drag empty ground to move around. Lengths snap to sensible angles — fine-tune any side below.</p>
+        <label class="side-lab">Quick start</label>
+        <div class="btnrow">
+          <button class="btn btn-secondary" data-preset="straight">Straight run</button>
+          <button class="btn btn-secondary" data-preset="L">L-shape</button>
+          <button class="btn btn-secondary" data-preset="U">3 sides</button>
+        </div>
+        <label class="side-lab">Your sides</label>
+        <div id="segList"></div>
+        <div id="segEmpty">No sides yet — click the plan to start.</div>
+        <div class="btnrow">
+          <button class="btn btn-secondary" id="undoBtn">Undo point</button>
+          <button class="btn btn-ghost" id="clearBtn">Clear</button>
+        </div>
+      </section>
+
+      <!-- STEP 2 : STYLE -->
+      <section class="panel" id="panel1">
+        <div class="kicker">Step 2 · Your fence</div>
+        <h1>Type &amp; style</h1>
+        <p class="lead">The preview on the right updates live as you choose.</p>
+        <label class="side-lab">Material</label>
+        <div id="typeCards"></div>
+        <label class="side-lab">Style</label>
+        <div id="styleCards"></div>
+        <label class="side-lab">Height</label>
+        <div class="chiprow" id="heightChips"></div>
+        <div id="colourWrap" style="display:none">
+          <label class="side-lab">Colorbond colour</label>
+          <div class="swatches" id="swatches"></div>
+          <div class="swname" id="swname"></div>
+        </div>
+      </section>
+
+      <!-- STEP 3 : PREVIEW / SUMMARY -->
+      <section class="panel" id="panel2">
+        <div class="kicker">Step 3 · Walk the line</div>
+        <h1>Your fence, built</h1>
+        <p class="lead">Drag to orbit, scroll to zoom, right-drag to pan. Happy with it? Send it straight into the quote form — we'll confirm everything with a free on-site measure.</p>
+        <div class="summary" id="summary"></div>
+        <div class="btnrow" style="margin-top:18px">
+          <button class="btn btn-primary" id="sendBtn">Use in my quote &rarr;</button>
+          <a class="btn btn-secondary" href="tel:0405785072" style="text-decoration:none">Call 0405 785 072</a>
+        </div>
+      </section>
+    </aside>
+
+    <div id="stage">
+      <div id="labels"></div>
+      <div id="hint"></div>
+      <div class="zoomctl">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">&minus;</button>
+        <button id="zfit" aria-label="Fit view" title="Fit to fence">&#8982;</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="bar">
+    <div class="cell"><div class="k">Total length</div><div class="v" id="barLen">0 m</div></div>
+    <div class="cell"><div class="k">Fence</div><div class="v" id="barFence">—</div></div>
+    <div class="cell"><div class="k">Indicative range</div><div class="v" id="barEst"><em>—</em></div></div>
+    <div class="spacer"></div>
+    <div class="note">Indicative supply &amp; install only. Your on-site quote is free, exact and no-obligation.</div>
+    <button class="btn btn-secondary" id="backBtn">&larr; Back</button>
+    <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ═══════════════ Catalogue (matches the quote wizard) ═══════════════ */
+const TYPES = {
+  timber:    { label: 'Timber',    from: 'from $95/m',  desc: 'Hardwood posts, paling or lapped & capped.' },
+  colorbond: { label: 'Colorbond', from: 'from $110/m', desc: 'Low-maintenance steel in 20+ colours.' },
+  rural:     { label: 'Rural',     from: 'from $45/m',  desc: 'Post & rail or post & wire for acreage.' }
+};
+const STYLES = {
+  timber: [
+    { id: 'single',   label: 'Butted single paling', desc: 'Classic boundary fence',               rate: [85, 110] },
+    { id: 'lapcap',   label: 'Lapped & capped',      desc: 'Premium — no gaps, capped top rail',   rate: [105, 140] }
+  ],
+  colorbond: [
+    { id: 'standard', label: 'Standard Colorbond',   desc: 'Steel sheet, 20+ colours',             rate: [100, 150] },
+    { id: 'lattice',  label: 'With lattice top',     desc: 'Extra height and privacy',             rate: [135, 190] }
+  ],
+  rural: [
+    { id: 'postrail', label: 'Post & rail',          desc: 'Timber rails, acreage look',           rate: [45, 80] },
+    { id: 'postwire', label: 'Post & wire',          desc: 'Stock and boundary fencing',           rate: [30, 55] }
+  ]
+};
+const HEIGHTS = ['1.5', '1.8', '2.1', '2.4'];
+const H_FACTOR = { '1.5': 0.9, '1.8': 1, '2.1': 1.15, '2.4': 1.3 };
+const COLOURS = [
+  { name: 'Monument',      hex: 0x323438 }, { name: 'Woodland Grey', hex: 0x4a4b46 },
+  { name: 'Basalt',        hex: 0x686a6c }, { name: 'Deep Ocean',    hex: 0x364152 },
+  { name: 'Surfmist',      hex: 0xe4e1d5 }, { name: 'Paperbark',     hex: 0xcbbfa8 }
+];
+
+/* ═══════════════ State ═══════════════ */
+const state = {
+  step: 0,
+  points: [],                    // [{x,z}] metres, y-up world
+  type: 'timber', styleId: 'single', height: '1.8', colour: COLOURS[0],
+  dragIdx: -1, hoverIdx: -1, cursor: null
+};
+
+/* ═══════════════ Three.js scaffold ═══════════════ */
+const stage = document.getElementById('stage');
+const labelsEl = document.getElementById('labels');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x232323);
+scene.fog = new THREE.Fog(0x232323, 80, 220);
+
+const hemi = new THREE.HemisphereLight(0xbfd4e6, 0x2f3a2a, 0.95);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff1da, 1.9);
+sun.position.set(24, 34, 14);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = sun.shadow.camera.bottom = -55;
+sun.shadow.camera.right = sun.shadow.camera.top = 55;
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+
+const ground = new THREE.Mesh(
+  new THREE.CircleGeometry(160, 64),
+  new THREE.MeshLambertMaterial({ color: 0x3d4733 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const grid = new THREE.GridHelper(120, 120, 0x5a5a5a, 0x3a3a3a);
+grid.position.y = 0.01;
+scene.add(grid);
+
+/* cameras — ortho top-down for drawing, perspective for preview.
+   Frustum is in world metres: HALF_VIEW is half the visible height, so the
+   default plan view shows ~44 m of yard. zoom=1 is that; wheel scales it. */
+const HALF_VIEW = 22;
+const orthoCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 400);
+orthoCam.position.set(0, 100, 0);
+orthoCam.up.set(0, 0, -1);
+orthoCam.lookAt(0, 0, 0);
+const perspCam = new THREE.PerspectiveCamera(55, 1, 0.1, 500);
+let activeCam = orthoCam;
+
+let _lastW = -1, _lastH = -1;
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (!w || !h) return;
+  _lastW = w; _lastH = h;
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const a = w / h;
+  orthoCam.left = -HALF_VIEW * a; orthoCam.right = HALF_VIEW * a;
+  orthoCam.top = HALF_VIEW; orthoCam.bottom = -HALF_VIEW;
+  orthoCam.updateProjectionMatrix();
+  perspCam.aspect = a; perspCam.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage);
+resize();
+
+/* ═══════════════ Draw-mode helpers (line + point handles) ═══════════════ */
+const drawGroup = new THREE.Group();
+scene.add(drawGroup);
+const lineMat = new THREE.LineBasicMaterial({ color: 0x8bc43f });
+const ghostMat = new THREE.LineDashedMaterial({ color: 0x8bc43f, dashSize: 0.4, gapSize: 0.25, transparent: true, opacity: 0.6 });
+const ptGeo = new THREE.CircleGeometry(0.35, 24);
+const ptMat = new THREE.MeshBasicMaterial({ color: 0x8bc43f });
+const ptMatHover = new THREE.MeshBasicMaterial({ color: 0xd8f0b0 });
+
+function rebuildDraw() {
+  drawGroup.clear();
+  const pts3 = state.points.map(p => new THREE.Vector3(p.x, 0.03, p.z));
+  if (pts3.length > 1) {
+    drawGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts3), lineMat));
+  }
+  pts3.forEach((v, i) => {
+    const m = new THREE.Mesh(ptGeo, i === state.hoverIdx || i === state.dragIdx ? ptMatHover : ptMat);
+    m.rotation.x = -Math.PI / 2;
+    m.position.copy(v);
+    drawGroup.add(m);
+  });
+  // ghost segment from last point to cursor
+  if (state.step === 0 && state.cursor && state.points.length && state.dragIdx === -1) {
+    const last = state.points[state.points.length - 1];
+    const g = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(last.x, 0.03, last.z), new THREE.Vector3(state.cursor.x, 0.03, state.cursor.z)
+    ]), ghostMat);
+    g.computeLineDistances();
+    drawGroup.add(g);
+  }
+}
+
+/* ═══════════════ Fence builder ═══════════════ */
+const fenceGroup = new THREE.Group();
+scene.add(fenceGroup);
+
+const M = {
+  paling:  new THREE.MeshLambertMaterial({ color: 0xbc9560 }),
+  paling2: new THREE.MeshLambertMaterial({ color: 0xb08a55 }),
+  post:    new THREE.MeshLambertMaterial({ color: 0x8f6f47 }),
+  rail:    new THREE.MeshLambertMaterial({ color: 0xa8834f }),
+  cap:     new THREE.MeshLambertMaterial({ color: 0x9c7a4a }),
+  steel:   new THREE.MeshLambertMaterial({ color: 0x323438 }),
+  wire:    new THREE.MeshLambertMaterial({ color: 0x9aa0a6 })
+};
+
+function segs() {
+  const out = [];
+  for (let i = 0; i < state.points.length - 1; i++) {
+    const a = state.points[i], b = state.points[i + 1];
+    const dx = b.x - a.x, dz = b.z - a.z;
+    const len = Math.hypot(dx, dz);
+    if (len > 0.25) out.push({ a, b, len, ang: Math.atan2(dz, dx) });
+  }
+  return out;
+}
+const totalLen = () => segs().reduce((s, g) => s + g.len, 0);
+
+function addInstanced(geo, mat, mats, jitter) {
+  const im = new THREE.InstancedMesh(geo, mat, mats.length);
+  const c = new THREE.Color();
+  mats.forEach((m, i) => {
+    im.setMatrixAt(i, m);
+    if (jitter) { c.setHex(0xffffff).offsetHSL(0, 0, (Math.random() - 0.5) * 0.09); im.setColorAt(i, c); }
+  });
+  im.castShadow = true;
+  fenceGroup.add(im);
+}
+const dummy = new THREE.Object3D();
+function matAt(x, y, z, ang, ry = 0) {
+  dummy.position.set(x, y, z);
+  dummy.rotation.set(0, -ang + ry, 0);
+  dummy.updateMatrix();
+  return dummy.matrix.clone();
+}
+
+function buildFence() {
+  fenceGroup.clear();
+  const list = segs();
+  if (!list.length) return;
+  const h = parseFloat(state.height);
+  const style = state.styleId;
+  M.steel.color.setHex(state.colour.hex);
+
+  // shared corner/intermediate posts
+  const postMats = [], seen = new Set();
+  const key = p => Math.round(p.x * 20) + ':' + Math.round(p.z * 20);
+
+  for (const s of list) {
+    const dir = { x: Math.cos(s.ang), z: Math.sin(s.ang) };
+    const at = t => ({ x: s.a.x + dir.x * t, z: s.a.z + dir.z * t });
+    const spacing = state.type === 'rural' ? 2.7 : 2.4;
+    const bays = Math.max(1, Math.round(s.len / spacing));
+    for (let i = 0; i <= bays; i++) {
+      const p = at((s.len * i) / bays);
+      const k = key(p);
+      if (!seen.has(k)) { seen.add(k); postMats.push({ p, ang: s.ang }); }
+    }
+
+    if (state.type === 'timber') {
+      const nRails = h >= 1.8 ? 3 : 2;
+      for (let r = 0; r < nRails; r++) {
+        const y = 0.25 + (h - 0.5) * (r / (nRails - 1));
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.07, 0.038), M.rail);
+        const mid = at(s.len / 2);
+        rail.position.set(mid.x, y, mid.z); rail.rotation.y = -s.ang; rail.castShadow = true;
+        fenceGroup.add(rail);
+      }
+      const lap = style === 'lapcap';
+      const w = 0.1, gap = lap ? 0.07 : 0.006, pitch = w + gap;
+      const n = Math.max(1, Math.floor(s.len / pitch));
+      const geo = new THREE.BoxGeometry(w, h - (lap ? 0.1 : 0.02), 0.017);
+      const mats = [];
+      for (let i = 0; i < n; i++) {
+        const p = at(pitch * (i + 0.5));
+        mats.push(matAt(p.x, (h - (lap ? 0.1 : 0.02)) / 2, p.z, s.ang));
+      }
+      addInstanced(geo, M.paling, mats, true);
+      if (lap) {
+        const mats2 = [];
+        for (let i = 0; i < n; i++) {
+          const t = pitch * (i + 1);
+          if (t < s.len) { const p = at(t); mats2.push(matAt(p.x, (h - 0.1) / 2, p.z + 0.0001, s.ang)); }
+        }
+        // second layer sits proud of the first
+        const geo2 = new THREE.BoxGeometry(w, h - 0.1, 0.017);
+        const off = mats2.map(m => { const e = m.clone(); const v = new THREE.Vector3(0, 0, 0.02).applyAxisAngle(new THREE.Vector3(0,1,0), -s.ang); e.setPosition(new THREE.Vector3().setFromMatrixPosition(m).add(v)); return e; });
+        addInstanced(geo2, M.paling2, off, true);
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.032, 0.07), M.cap);
+        const mid = at(s.len / 2);
+        cap.position.set(mid.x, h - 0.08, mid.z); cap.rotation.y = -s.ang; cap.castShadow = true;
+        fenceGroup.add(cap);
+      }
+    }
+
+    else if (state.type === 'colorbond') {
+      const lat = style === 'lattice';
+      const sheetH = h - 0.14;
+      const mid = at(s.len / 2);
+      const sheet = new THREE.Mesh(new THREE.BoxGeometry(s.len, sheetH, 0.016), M.steel);
+      sheet.position.set(mid.x, 0.07 + sheetH / 2, mid.z); sheet.rotation.y = -s.ang; sheet.castShadow = true;
+      fenceGroup.add(sheet);
+      for (const y of [0.06, h - 0.04]) {
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.075, 0.05), M.steel);
+        rail.position.set(mid.x, y, mid.z); rail.rotation.y = -s.ang; rail.castShadow = true;
+        fenceGroup.add(rail);
+      }
+      const ribGeo = new THREE.BoxGeometry(0.045, sheetH - 0.02, 0.034);
+      const ribs = [];
+      for (let t = 0.19; t < s.len; t += 0.19) {
+        const p = at(t);
+        ribs.push(matAt(p.x, 0.07 + sheetH / 2, p.z, s.ang));
+      }
+      addInstanced(ribGeo, M.steel, ribs);
+      if (lat) {
+        const latH = 0.45;
+        const tex = latticeTexture(state.colour.hex);
+        tex.repeat.set(Math.max(1, Math.round(s.len / 0.32)), 1.5);
+        const lm = new THREE.Mesh(new THREE.PlaneGeometry(s.len, latH),
+          new THREE.MeshLambertMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.4 }));
+        lm.position.set(mid.x, h + latH / 2 - 0.02, mid.z); lm.rotation.y = -s.ang; lm.castShadow = true;
+        fenceGroup.add(lm);
+        const capr = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.05, 0.05), M.steel);
+        capr.position.set(mid.x, h + latH, mid.z); capr.rotation.y = -s.ang; capr.castShadow = true;
+        fenceGroup.add(capr);
+      }
+    }
+
+    else { // rural
+      const mid = at(s.len / 2);
+      if (style === 'postrail') {
+        const nRails = 3;
+        for (let r = 0; r < nRails; r++) {
+          const y = h * (0.32 + 0.31 * r);
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.14, 0.045), M.rail);
+          rail.position.set(mid.x, Math.min(y, h - 0.07), mid.z); rail.rotation.y = -s.ang; rail.castShadow = true;
+          fenceGroup.add(rail);
+        }
+      } else {
+        for (let r = 0; r < 5; r++) {
+          const y = 0.18 + (h - 0.3) * (r / 4);
+          const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, s.len, 5), M.wire);
+          wire.position.set(mid.x, y, mid.z);
+          wire.rotation.z = Math.PI / 2; wire.rotation.y = -s.ang;
+          fenceGroup.add(wire);
+        }
+      }
+    }
+  }
+
+  // posts
+  if (state.type === 'rural') {
+    const g = new THREE.CylinderGeometry(0.085, 0.095, h + 0.05, 10);
+    addInstanced(g, M.post, postMats.map(o => matAt(o.p.x, (h + 0.05) / 2, o.p.z, o.ang)));
+  } else if (state.type === 'colorbond') {
+    const g = new THREE.BoxGeometry(0.07, h + 0.02, 0.07);
+    addInstanced(g, M.steel, postMats.map(o => matAt(o.p.x, (h + 0.02) / 2, o.p.z, o.ang)));
+  } else {
+    const g = new THREE.BoxGeometry(0.1, h + 0.06, 0.1);
+    addInstanced(g, M.post, postMats.map(o => matAt(o.p.x, (h + 0.06) / 2, o.p.z, o.ang)), true);
+  }
+}
+
+let _latTex = null, _latHex = null;
+function latticeTexture(hex) {
+  if (_latTex && _latHex === hex) return _latTex;
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d');
+  g.clearRect(0, 0, 64, 64);
+  g.strokeStyle = '#' + hex.toString(16).padStart(6, '0');
+  g.lineWidth = 9; g.lineCap = 'square';
+  for (let i = -64; i <= 128; i += 32) {
+    g.beginPath(); g.moveTo(i, -8); g.lineTo(i + 72, 72); g.stroke();
+    g.beginPath(); g.moveTo(i + 72, -8); g.lineTo(i, 72); g.stroke();
+  }
+  _latTex = new THREE.CanvasTexture(c);
+  _latTex.wrapS = _latTex.wrapT = THREE.RepeatWrapping;
+  _latHex = hex;
+  return _latTex;
+}
+
+/* ═══════════════ Orbit controls (perspective preview) ═══════════════ */
+const orbit = { target: new THREE.Vector3(), theta: -0.9, phi: 1.18, radius: 18 };
+function applyOrbit() {
+  const sp = Math.sin(orbit.phi), cp = Math.cos(orbit.phi);
+  perspCam.position.set(
+    orbit.target.x + orbit.radius * sp * Math.cos(orbit.theta),
+    orbit.target.y + orbit.radius * cp,
+    orbit.target.z + orbit.radius * sp * Math.sin(orbit.theta)
+  );
+  perspCam.lookAt(orbit.target);
+}
+function frameFence() {
+  const pts = state.points;
+  if (!pts.length) return;
+  const box = new THREE.Box3();
+  pts.forEach(p => box.expandByPoint(new THREE.Vector3(p.x, 0, p.z)));
+  box.expandByPoint(box.min.clone().setY(0)); box.expandByPoint(box.max.clone().setY(parseFloat(state.height)));
+  const c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+  orbit.target.copy(c).setY(parseFloat(state.height) * 0.45);
+  orbit.radius = Math.max(8, Math.max(sz.x, sz.z) * 0.85 + 7);
+  applyOrbit();
+}
+
+/* ═══════════════ Pointer interaction ═══════════════ */
+const ray = new THREE.Raycaster();
+const planeY = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const ndc = new THREE.Vector2();
+function toGround(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, activeCam);
+  const v = new THREE.Vector3();
+  return ray.ray.intersectPlane(planeY, v) ? { x: v.x, z: v.z } : null;
+}
+function screenPos(x, y, z) {
+  const v = new THREE.Vector3(x, y, z).project(activeCam);
+  const r = renderer.domElement;
+  return { x: (v.x + 1) / 2 * r.clientWidth, y: (-v.y + 1) / 2 * r.clientHeight, behind: v.z > 1 };
+}
+function pointNear(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  for (let i = 0; i < state.points.length; i++) {
+    const s = screenPos(state.points[i].x, 0, state.points[i].z);
+    if (Math.hypot(s.x - (ev.clientX - r.left), s.y - (ev.clientY - r.top)) < 14) return i;
+  }
+  return -1;
+}
+function snapped(p, prev) {
+  if (!prev) return { x: Math.round(p.x * 10) / 10, z: Math.round(p.z * 10) / 10 };
+  const dx = p.x - prev.x, dz = p.z - prev.z;
+  const len = Math.round(Math.hypot(dx, dz) * 10) / 10;
+  const step = Math.PI / 12; // 15°
+  const ang = Math.round(Math.atan2(dz, dx) / step) * step;
+  return { x: prev.x + Math.cos(ang) * len, z: prev.z + Math.sin(ang) * len };
+}
+
+/* Gesture model — works for mouse AND touch:
+     tap (little movement)  → place a corner (step 1)
+     drag on a corner       → move that corner
+     drag on empty ground   → pan the plan / orbit the preview
+     two-finger pinch       → zoom (plan) or dolly (preview), centroid drag pans
+     right/middle drag      → pan (desktop)                                    */
+const pointers = new Map();
+let gesture = null;
+const wppNow = () => (orthoCam.top - orthoCam.bottom) / (orthoCam.zoom * renderer.domElement.clientHeight);
+function pinchInfo() {
+  const [a, b] = [...pointers.values()];
+  return { cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, d: Math.max(10, Math.hypot(a.x - b.x, a.y - b.y)) };
+}
+function panPreview(dx, dy) {
+  const right = new THREE.Vector3().setFromMatrixColumn(perspCam.matrix, 0).setY(0).normalize();
+  const fwd = new THREE.Vector3().setFromMatrixColumn(perspCam.matrix, 2).setY(0).normalize();
+  orbit.target.addScaledVector(right, -dx * orbit.radius * 0.0012);
+  orbit.target.addScaledVector(fwd, dy * orbit.radius * 0.0012);
+  applyOrbit();
+}
+
+renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
+renderer.domElement.addEventListener('pointerdown', ev => {
+  ev.preventDefault();
+  try { renderer.domElement.setPointerCapture(ev.pointerId); } catch (e) {}
+  pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (pointers.size === 2) {
+    if (gesture && gesture.mode === 'dragpt') { state.dragIdx = -1; rebuildDraw(); }
+    const p = pinchInfo();
+    gesture = { mode: 'pinch', cx: p.cx, cy: p.cy, d0: p.d, z0: orthoCam.zoom, r0: orbit.radius };
+    return;
+  }
+  if (pointers.size > 2) { gesture = { mode: 'dead' }; return; }
+  if (ev.button === 2 || ev.button === 1) { gesture = { mode: 'pan', x: ev.clientX, y: ev.clientY }; return; }
+  if (state.step === 0) {
+    const idx = pointNear(ev);
+    if (idx >= 0) { gesture = { mode: 'dragpt', idx }; state.dragIdx = idx; }
+    else gesture = { mode: 'tap', x: ev.clientX, y: ev.clientY, sx: ev.clientX, sy: ev.clientY };
+  } else {
+    gesture = { mode: 'orbit', x: ev.clientX, y: ev.clientY };
+  }
+});
+
+renderer.domElement.addEventListener('pointermove', ev => {
+  if (pointers.has(ev.pointerId)) pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (!gesture) {
+    // hover: ghost segment + corner highlight
+    if (state.step !== 0) return;
+    state.cursor = toGround(ev);
+    const h = pointNear(ev);
+    if (h !== state.hoverIdx) state.hoverIdx = h;
+    renderer.domElement.style.cursor = h >= 0 ? 'grab' : 'crosshair';
+    rebuildDraw();
+    return;
+  }
+  if (gesture.mode === 'dead') return;
+  if (gesture.mode === 'pinch') {
+    if (pointers.size < 2) return;
+    const p = pinchInfo();
+    const dcx = p.cx - gesture.cx, dcy = p.cy - gesture.cy;
+    gesture.cx = p.cx; gesture.cy = p.cy;
+    if (state.step === 0) {
+      orthoCam.zoom = Math.min(8, Math.max(0.3, gesture.z0 * (p.d / gesture.d0)));
+      orthoCam.updateProjectionMatrix();
+      const s = wppNow();
+      orthoCam.position.x -= dcx * s; orthoCam.position.z -= dcy * s;
+    } else {
+      orbit.radius = Math.min(120, Math.max(4, gesture.r0 * (gesture.d0 / p.d)));
+      panPreview(dcx, dcy);
+    }
+    return;
+  }
+  const dx = ev.clientX - gesture.x, dy = ev.clientY - gesture.y;
+  gesture.x = ev.clientX; gesture.y = ev.clientY;
+  if (gesture.mode === 'tap') {
+    if (Math.hypot(ev.clientX - gesture.sx, ev.clientY - gesture.sy) <= 8) return;
+    gesture.mode = 'pan';  // finger moved: it's a pan, not a corner tap
+  }
+  if (gesture.mode === 'pan') {
+    if (state.step === 0) {
+      const s = wppNow();
+      orthoCam.position.x -= dx * s; orthoCam.position.z -= dy * s;
+    } else panPreview(dx, dy);
+    return;
+  }
+  if (gesture.mode === 'dragpt') {
+    const g = toGround(ev);
+    if (g) {
+      const prev = state.points[gesture.idx - 1] || null;
+      state.points[gesture.idx] = snapped(g, prev);
+      refresh(true);
+    }
+    return;
+  }
+  if (gesture.mode === 'orbit') {
+    orbit.theta += dx * 0.006;
+    orbit.phi = Math.min(1.5, Math.max(0.25, orbit.phi - dy * 0.005));
+    applyOrbit();
+  }
+});
+
+function endPointer(ev) {
+  pointers.delete(ev.pointerId);
+  if (!gesture) return;
+  if (pointers.size > 0) { gesture = { mode: 'dead' }; return; }  // pinch remnant: ignore last finger
+  if (gesture.mode === 'tap' && state.step === 0) {
+    const g = toGround(ev);
+    if (g && state.points.length < 24) {
+      state.points.push(snapped(g, state.points[state.points.length - 1]));
+      refresh();
+    }
+  } else if (gesture.mode === 'dragpt') {
+    state.dragIdx = -1; refresh();
+  }
+  gesture = null;
+}
+addEventListener('pointerup', endPointer);
+addEventListener('pointercancel', endPointer);
+renderer.domElement.addEventListener('wheel', ev => {
+  ev.preventDefault();
+  if (state.step === 0) {
+    orthoCam.zoom = Math.min(8, Math.max(0.3, orthoCam.zoom * (ev.deltaY > 0 ? 0.9 : 1.11)));
+    orthoCam.updateProjectionMatrix();
+  } else {
+    orbit.radius = Math.min(120, Math.max(4, orbit.radius * (ev.deltaY > 0 ? 1.1 : 0.91)));
+    applyOrbit();
+  }
+}, { passive: false });
+
+/* ═══════════════ Estimate ═══════════════ */
+const fmt = x => '$' + x.toLocaleString('en-AU');
+function estimate() {
+  const L = totalLen();
+  const st = STYLES[state.type].find(s => s.id === state.styleId);
+  if (!L || !st) return null;
+  const f = H_FACTOR[state.height] || 1;
+  const r = x => Math.round(x / 50) * 50;
+  return { low: r(L * st.rate[0] * f), high: r(L * st.rate[1] * f) };
+}
+
+/* ═══════════════ UI ═══════════════ */
+const $ = id => document.getElementById(id);
+const hintEl = $('hint');
+
+function styleOf() { return STYLES[state.type].find(s => s.id === state.styleId); }
+
+function renderSidebar() {
+  // type cards
+  $('typeCards').innerHTML = Object.entries(TYPES).map(([id, t]) =>
+    `<button class="cardbtn ${state.type === id ? 'sel' : ''}" data-type="${id}">
+       <span class="t">${t.label}<span class="from">${t.from}</span></span>
+       <span class="d">${t.desc}</span></button>`).join('');
+  $('styleCards').innerHTML = STYLES[state.type].map(s =>
+    `<button class="cardbtn ${state.styleId === s.id ? 'sel' : ''}" data-style="${s.id}">
+       <span class="t">${s.label}</span><span class="d">${s.desc}</span></button>`).join('');
+  $('heightChips').innerHTML = HEIGHTS.map(h =>
+    `<button class="chip ${state.height === h ? 'sel' : ''}" data-h="${h}">${h} m</button>`).join('');
+  $('colourWrap').style.display = state.type === 'colorbond' ? '' : 'none';
+  $('swatches').innerHTML = COLOURS.map((c, i) =>
+    `<button class="sw ${state.colour === c ? 'sel' : ''}" data-c="${i}" title="${c.name}"
+       style="background:#${c.hex.toString(16).padStart(6, '0')}"></button>`).join('');
+  $('swname').textContent = state.type === 'colorbond' ? state.colour.name : '';
+}
+
+function renderSegList() {
+  const list = segs();
+  $('segEmpty').style.display = list.length ? 'none' : '';
+  $('segList').innerHTML = list.map((s, i) =>
+    `<div class="segrow"><span class="nm">Side ${i + 1}</span>
+       <input type="number" min="0.5" step="0.1" value="${s.len.toFixed(1)}" data-seg="${i}"><span class="u">m</span></div>`).join('');
+}
+
+function renderSummary() {
+  const st = styleOf(), e = estimate();
+  $('summary').innerHTML = `<dl>
+    <dt>Sides</dt><dd>${segs().length}</dd>
+    <dt>Total length</dt><dd>${totalLen().toFixed(1)} m</dd>
+    <dt>Fence</dt><dd>${TYPES[state.type].label} — ${st.label}</dd>
+    <dt>Height</dt><dd>${state.height} m</dd>
+    ${state.type === 'colorbond' ? `<dt>Colour</dt><dd>${state.colour.name}</dd>` : ''}
+    ${e ? `<dt>Indicative range</dt><dd style="color:var(--color-accent)">${fmt(e.low)} – ${fmt(e.high)}</dd>` : ''}
+  </dl>`;
+}
+
+function renderBar() {
+  const L = totalLen(), e = estimate(), st = styleOf();
+  $('barLen').textContent = L ? L.toFixed(1) + ' m' : '0 m';
+  $('barFence').textContent = st ? `${TYPES[state.type].label} · ${state.height} m` : '—';
+  $('barEst').innerHTML = e ? `<em>${fmt(e.low)} – ${fmt(e.high)}</em>` : '<em>—</em>';
+  $('nextBtn').textContent = state.step === 2 ? 'Use in my quote →' : 'Next →';
+  $('nextBtn').style.opacity = (state.step === 0 && segs().length === 0) ? 0.4 : 1;
+  $('backBtn').style.visibility = state.step === 0 ? 'hidden' : 'visible';
+}
+
+function renderStep() {
+  document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i === state.step));
+  document.querySelectorAll('#crumbs .c').forEach(c => {
+    const s = +c.dataset.s;
+    c.classList.toggle('active', s === state.step);
+    c.classList.toggle('done', s < state.step);
+  });
+  hintEl.textContent = state.step === 0
+    ? 'Tap to place corners · drag to pan · pinch or scroll to zoom'
+    : 'Drag to orbit · pinch or scroll to zoom · two-finger or right-drag to pan';
+  grid.visible = state.step === 0;
+  drawGroup.visible = state.step === 0;
+  fenceGroup.visible = state.step !== 0;
+  activeCam = state.step === 0 ? orthoCam : perspCam;
+  if (state.step !== 0) { buildFence(); frameFence(); }
+  renderer.domElement.style.cursor = state.step === 0 ? 'crosshair' : 'grab';
+}
+
+function refresh(light) {
+  rebuildDraw();
+  if (!light) renderSegList();
+  renderBar();
+  if (state.step !== 0) { buildFence(); }
+  if (state.step === 2) renderSummary();
+}
+
+/* labels each frame */
+function updateLabels() {
+  const list = segs();
+  let html = '';
+  const y = state.step === 0 ? 0 : parseFloat(state.height) + 0.35;
+  list.forEach(s => {
+    const p = screenPos((s.a.x + s.b.x) / 2, y, (s.a.z + s.b.z) / 2);
+    if (!p.behind) html += `<div class="mlabel" style="left:${p.x}px;top:${p.y}px">${s.len.toFixed(1)} m</div>`;
+  });
+  if (state.step === 0 && state.cursor && state.points.length && state.dragIdx === -1) {
+    const last = state.points[state.points.length - 1];
+    const len = Math.hypot(state.cursor.x - last.x, state.cursor.z - last.z);
+    if (len > 0.3) {
+      const p = screenPos((last.x + state.cursor.x) / 2, 0, (last.z + state.cursor.z) / 2);
+      if (!p.behind) html += `<div class="mlabel ghost" style="left:${p.x}px;top:${p.y}px">${len.toFixed(1)} m</div>`;
+    }
+  }
+  labelsEl.innerHTML = html;
+}
+
+/* ═══════════════ Events ═══════════════ */
+document.querySelector('aside').addEventListener('click', ev => {
+  const b = ev.target.closest('button');
+  if (!b) return;
+  if (b.dataset.type) { state.type = b.dataset.type; state.styleId = STYLES[state.type][0].id; renderSidebar(); refresh(); }
+  else if (b.dataset.style) { state.styleId = b.dataset.style; renderSidebar(); refresh(); }
+  else if (b.dataset.h) { state.height = b.dataset.h; renderSidebar(); refresh(); if (state.step !== 0) frameFence(); }
+  else if (b.dataset.c) { state.colour = COLOURS[+b.dataset.c]; renderSidebar(); refresh(); }
+  else if (b.dataset.preset) { preset(b.dataset.preset); }
+  else if (b.id === 'undoBtn') { state.points.pop(); refresh(); }
+  else if (b.id === 'clearBtn') { state.points = []; refresh(); }
+  else if (b.id === 'sendBtn') { sendToQuote(); }
+});
+document.querySelector('aside').addEventListener('change', ev => {
+  const i = ev.target.closest('input[data-seg]');
+  if (!i) return;
+  const idx = +i.dataset.seg, nl = Math.max(0.5, parseFloat(i.value) || 0.5);
+  const a = state.points[idx], b = state.points[idx + 1];
+  const len = Math.hypot(b.x - a.x, b.z - a.z);
+  const ux = (b.x - a.x) / len, uz = (b.z - a.z) / len;
+  const dx = ux * (nl - len), dz = uz * (nl - len);
+  for (let j = idx + 1; j < state.points.length; j++) { state.points[j].x += dx; state.points[j].z += dz; }
+  refresh();
+});
+
+function preset(kind) {
+  if (kind === 'straight') state.points = [{ x: -8, z: 0 }, { x: 8, z: 0 }];
+  if (kind === 'L') state.points = [{ x: -8, z: 5 }, { x: -8, z: -5 }, { x: 8, z: -5 }];
+  if (kind === 'U') state.points = [{ x: -8, z: 6 }, { x: -8, z: -6 }, { x: 8, z: -6 }, { x: 8, z: 6 }];
+  fitView();
+  refresh();
+}
+
+/* zoom buttons — the only zoom on touch besides pinch */
+function zoomStep(f) {
+  if (state.step === 0) {
+    orthoCam.zoom = Math.min(8, Math.max(0.3, orthoCam.zoom * f));
+    orthoCam.updateProjectionMatrix();
+  } else {
+    orbit.radius = Math.min(120, Math.max(4, orbit.radius / f));
+    applyOrbit();
+  }
+}
+function fitView() {
+  if (state.step !== 0) { frameFence(); return; }
+  if (!state.points.length) {
+    orthoCam.position.x = 0; orthoCam.position.z = 0;
+    orthoCam.zoom = 1; orthoCam.updateProjectionMatrix();
+    return;
+  }
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  state.points.forEach(p => {
+    minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+    minZ = Math.min(minZ, p.z); maxZ = Math.max(maxZ, p.z);
+  });
+  orthoCam.position.x = (minX + maxX) / 2;
+  orthoCam.position.z = (minZ + maxZ) / 2;
+  const a = (orthoCam.right - orthoCam.left) / (orthoCam.top - orthoCam.bottom);
+  const need = Math.max((maxX - minX + 8) / (2 * HALF_VIEW * a), (maxZ - minZ + 8) / (2 * HALF_VIEW), 1e-6);
+  orthoCam.zoom = Math.min(8, Math.max(0.3, 1 / need));
+  orthoCam.updateProjectionMatrix();
+}
+$('zin').addEventListener('click', () => zoomStep(1.3));
+$('zout').addEventListener('click', () => zoomStep(1 / 1.3));
+$('zfit').addEventListener('click', fitView);
+
+$('nextBtn').addEventListener('click', () => {
+  if (state.step === 0 && segs().length === 0) return;
+  if (state.step === 2) { sendToQuote(); return; }
+  state.step++; renderStep(); renderBar(); if (state.step === 2) renderSummary();
+});
+$('backBtn').addEventListener('click', () => {
+  if (state.step === 0) return;
+  state.step--; renderStep(); renderBar();
+});
+
+function sendToQuote() {
+  try {
+    localStorage.setItem('jrcMeasurePrefill', JSON.stringify({
+      type: state.type, style: state.styleId, height: state.height,
+      length: Math.round(totalLen()),
+      colour: state.type === 'colorbond' ? state.colour.name : null
+    }));
+  } catch (e) {}
+  location.href = 'JRC%20Fencing.dc.html#quote';
+}
+
+/* ═══════════════ Boot ═══════════════ */
+renderSidebar(); renderSegList(); renderStep(); renderBar();
+let _ticked = false;
+function tick() {
+  _ticked = true;
+  // self-heal sizing: some embedded contexts start the page hidden, so the
+  // initial ResizeObserver tick sees 0×0 — recheck every frame.
+  if (stage.clientWidth !== _lastW || stage.clientHeight !== _lastH) resize();
+  renderer.render(scene, activeCam);
+  updateLabels();
+}
+(function loop() { requestAnimationFrame(loop); tick(); })();
+// rAF is throttled to zero in some embedded/hidden contexts — keep a slow
+// timer fallback so the app still draws there.
+setTimeout(function fallback() {
+  if (!_ticked) tick();
+  _ticked = false;
+  setTimeout(fallback, 250);
+}, 500);
+</script>
+</body>
+</html>
