@@ -68,7 +68,7 @@ label.side-lab{display:block;font-family:var(--font-heading);font-weight:600;fon
 #segList{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .segrow{display:flex;align-items:center;gap:8px;font-size:13px}
 .segrow .nm{width:58px;color:color-mix(in srgb,var(--color-text) 60%,transparent)}
-.segrow input{width:74px;background:var(--color-surface);border:1px solid var(--color-divider);color:inherit;font:inherit;font-size:13px;padding:5px 8px}
+.segrow input{width:62px;background:var(--color-surface);border:1px solid var(--color-divider);color:inherit;font:inherit;font-size:13px;padding:5px 8px}
 .segrow input:focus{outline:none;border-color:var(--color-accent)}
 .segrow .u{color:color-mix(in srgb,var(--color-text) 50%,transparent)}
 #segEmpty{font-size:13px;color:color-mix(in srgb,var(--color-text) 50%,transparent);border:1px dashed var(--color-divider);padding:14px;text-align:center}
@@ -144,6 +144,7 @@ label.side-lab{display:block;font-family:var(--font-heading);font-weight:600;fon
         <label class="side-lab">Your sides</label>
         <div id="segList"></div>
         <div id="segEmpty">No sides yet — click the plan to start.</div>
+        <div class="swname" style="margin:6px 0 10px">&#8597; sets how much that side rises (+) or falls (&minus;), in metres.</div>
         <div class="btnrow">
           <button class="btn btn-secondary" id="undoBtn">Undo point</button>
           <button class="btn btn-ghost" id="clearBtn">Clear</button>
@@ -161,6 +162,11 @@ label.side-lab{display:block;font-family:var(--font-heading);font-weight:600;fon
         <div id="styleCards"></div>
         <label class="side-lab">Height</label>
         <div class="chiprow" id="heightChips"></div>
+        <label class="side-lab">Sloping ground</label>
+        <div class="chiprow" id="slopeChips"></div>
+        <div class="swname">Raked follows the slope; stepped drops in level panels. Set each side's rise (&#8597;) in step 1.</div>
+        <label class="side-lab">Sleepers under fence</label>
+        <div class="chiprow" id="sleeperChips"></div>
         <div id="colourWrap" style="display:none">
           <label class="side-lab">Colorbond colour</label>
           <div class="swatches" id="swatches"></div>
@@ -228,6 +234,11 @@ const STYLES = {
 };
 const HEIGHTS = ['1.5', '1.8', '2.1', '2.4'];
 const H_FACTOR = { '1.5': 0.9, '1.8': 1, '2.1': 1.15, '2.4': 1.3 };
+const SLEEPERS = [
+  { label: 'None',            rate: [0, 0] },
+  { label: '1 row (200 mm)',  rate: [80, 110] },
+  { label: '2 rows (400 mm)', rate: [150, 200] }
+];
 const COLOURS = [
   { name: 'Monument',      hex: 0x323438 }, { name: 'Woodland Grey', hex: 0x4a4b46 },
   { name: 'Basalt',        hex: 0x686a6c }, { name: 'Deep Ocean',    hex: 0x364152 },
@@ -237,10 +248,13 @@ const COLOURS = [
 /* ═══════════════ State ═══════════════ */
 const state = {
   step: 0,
-  points: [],                    // [{x,z}] metres, y-up world
+  points: [],                    // [{x,z,y}] metres, y-up world; y = ground elevation at that corner
   type: 'timber', styleId: 'single', height: '1.8', colour: COLOURS[0],
+  slopeMode: 'raked',            // 'raked' | 'stepped' — how panels handle a slope
+  sleepers: 0,                   // rows of 200 mm sleepers under the fence (0–2)
   dragIdx: -1, hoverIdx: -1, cursor: null
 };
+const anySlope = () => state.points.some(p => Math.abs(p.y || 0) > 0.005);
 
 /* ═══════════════ Three.js scaffold ═══════════════ */
 const stage = document.getElementById('stage');
@@ -347,7 +361,9 @@ const M = {
   rail:    new THREE.MeshLambertMaterial({ color: 0xa8834f }),
   cap:     new THREE.MeshLambertMaterial({ color: 0x9c7a4a }),
   steel:   new THREE.MeshLambertMaterial({ color: 0x323438 }),
-  wire:    new THREE.MeshLambertMaterial({ color: 0x9aa0a6 })
+  wire:    new THREE.MeshLambertMaterial({ color: 0x9aa0a6 }),
+  sleeper: new THREE.MeshLambertMaterial({ color: 0x8e8e86 }),
+  turf:    new THREE.MeshLambertMaterial({ color: 0x475434 })
 };
 
 function segs() {
@@ -373,9 +389,10 @@ function addInstanced(geo, mat, mats, jitter) {
   fenceGroup.add(im);
 }
 const dummy = new THREE.Object3D();
-function matAt(x, y, z, ang, ry = 0) {
+function matAt(x, y, z, ang, ry = 0, tilt = 0) {
   dummy.position.set(x, y, z);
-  dummy.rotation.set(0, -ang + ry, 0);
+  dummy.rotation.set(0, -ang + ry, tilt);
+  dummy.scale.set(1, 1, 1);
   dummy.updateMatrix();
   return dummy.matrix.clone();
 }
@@ -387,6 +404,12 @@ function buildFence() {
   const h = parseFloat(state.height);
   const style = state.styleId;
   M.steel.color.setHex(state.colour.hex);
+  const nSleep = state.sleepers, SLEEP_H = 0.2;
+
+  // drop the flat ground so downhill sections aren't swallowed by it
+  ground.position.y = anySlope()
+    ? Math.min(0, ...state.points.map(p => p.y || 0)) - 0.05
+    : 0;
 
   // shared corner/intermediate posts
   const postMats = [], seen = new Set();
@@ -395,115 +418,186 @@ function buildFence() {
   for (const s of list) {
     const dir = { x: Math.cos(s.ang), z: Math.sin(s.ang) };
     const at = t => ({ x: s.a.x + dir.x * t, z: s.a.z + dir.z * t });
+    const ya = s.a.y || 0, yb = s.b.y || 0, rise = yb - ya;
+    const elevAt = t => ya + rise * (t / s.len);
+    const tilt = Math.atan2(rise, s.len);
     const spacing = state.type === 'rural' ? 2.7 : 2.4;
     const bays = Math.max(1, Math.round(s.len / spacing));
+    // level bays — used for stepped panels and for sleepers
+    const bayList = [];
+    for (let i = 0; i < bays; i++) {
+      const t0 = s.len * i / bays, t1 = s.len * (i + 1) / bays;
+      bayList.push({ t0, t1, base: Math.max(elevAt(t0), elevAt(t1)) });
+    }
+    // stepping only applies to panelised fences on an actual slope
+    const doStep = state.slopeMode === 'stepped' && state.type !== 'rural' && Math.abs(rise) > 0.005;
+    const baseOfT = t => doStep
+      ? bayList[Math.min(bays - 1, Math.floor(t / s.len * bays))].base
+      : elevAt(t);
+    // spans: one continuous (possibly raked) run, or one level piece per bay
+    const spans = doStep
+      ? bayList.map(b => ({ t0: b.t0, t1: b.t1, base: b.base, tilt: 0 }))
+      : [{ t0: 0, t1: s.len, base: (ya + yb) / 2, tilt }];
+
     for (let i = 0; i <= bays; i++) {
-      const p = at((s.len * i) / bays);
+      const t = (s.len * i) / bays;
+      const p = at(t);
       const k = key(p);
-      if (!seen.has(k)) { seen.add(k); postMats.push({ p, ang: s.ang }); }
+      if (!seen.has(k)) {
+        seen.add(k);
+        postMats.push({ p, ang: s.ang, bot: elevAt(t) - 0.35, top: baseOfT(Math.min(t, s.len - 0.01)) + h });
+      }
     }
 
-    if (state.type === 'timber') {
-      const nRails = h >= 1.8 ? 3 : 2;
-      for (let r = 0; r < nRails; r++) {
-        const y = 0.25 + (h - 0.5) * (r / (nRails - 1));
-        const rail = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.07, 0.038), M.rail);
-        const mid = at(s.len / 2);
-        rail.position.set(mid.x, y, mid.z); rail.rotation.y = -s.ang; rail.castShadow = true;
-        fenceGroup.add(rail);
+    // sleepers — level per bay, top flush with the panel base
+    if (nSleep > 0) {
+      for (const b of bayList) {
+        const mid = at((b.t0 + b.t1) / 2);
+        const sl = new THREE.Mesh(new THREE.BoxGeometry(b.t1 - b.t0 - 0.02, nSleep * SLEEP_H, 0.08), M.sleeper);
+        sl.position.set(mid.x, b.base - (nSleep * SLEEP_H) / 2 + 0.01, mid.z);
+        sl.rotation.y = -s.ang;
+        sl.castShadow = true;
+        fenceGroup.add(sl);
       }
+    }
+
+    // rails / sheets / caps — per span so stepped runs break into level pieces
+    for (const sp of spans) {
+      const L = sp.t1 - sp.t0;
+      const runL = L / Math.cos(sp.tilt);          // true length along the rake
+      const midT = (sp.t0 + sp.t1) / 2;
+      const mid = at(midT);
+      const baseMid = sp.tilt ? elevAt(midT) : sp.base;
+      const box = (bl, bh, bd, mat) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(bl, bh, bd), mat);
+        m.rotation.set(0, -s.ang, sp.tilt);
+        m.castShadow = true;
+        fenceGroup.add(m);
+        return m;
+      };
+
+      if (state.type === 'timber') {
+        const nRails = h >= 1.8 ? 3 : 2;
+        for (let r = 0; r < nRails; r++) {
+          const y = 0.25 + (h - 0.5) * (r / (nRails - 1));
+          box(runL, 0.07, 0.038, M.rail).position.set(mid.x, baseMid + y, mid.z);
+        }
+        if (style === 'lapcap') {
+          box(runL, 0.032, 0.07, M.cap).position.set(mid.x, baseMid + h - 0.08, mid.z);
+        }
+      }
+
+      else if (state.type === 'colorbond') {
+        const sheetH = h - 0.14;
+        box(runL, sheetH, 0.016, M.steel).position.set(mid.x, baseMid + 0.07 + sheetH / 2, mid.z);
+        for (const y of [0.06, h - 0.04]) {
+          box(runL, 0.075, 0.05, M.steel).position.set(mid.x, baseMid + y, mid.z);
+        }
+        const ribGeo = new THREE.BoxGeometry(0.045, sheetH - 0.02, 0.034);
+        const ribs = [];
+        for (let t = sp.t0 + 0.19; t < sp.t1; t += 0.19) {
+          const p = at(t);
+          ribs.push(matAt(p.x, baseOfT(t) + 0.07 + sheetH / 2, p.z, s.ang, 0, sp.tilt));
+        }
+        addInstanced(ribGeo, M.steel, ribs);
+        if (style === 'lattice') {
+          const latH = 0.45;
+          const tex = latticeTexture(state.colour.hex);
+          tex.repeat.set(Math.max(1, Math.round(L / 0.32)), 1.5);
+          const lm = new THREE.Mesh(new THREE.PlaneGeometry(runL, latH),
+            new THREE.MeshLambertMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.4 }));
+          lm.position.set(mid.x, baseMid + h + latH / 2 - 0.02, mid.z);
+          lm.rotation.set(0, -s.ang, sp.tilt); lm.castShadow = true;
+          fenceGroup.add(lm);
+          box(runL, 0.05, 0.05, M.steel).position.set(mid.x, baseMid + h + latH, mid.z);
+        }
+      }
+    }
+
+    // palings stay vertical and sit on the ground (raked) or on each level bay (stepped)
+    if (state.type === 'timber') {
       const lap = style === 'lapcap';
       const w = 0.1, gap = lap ? 0.07 : 0.006, pitch = w + gap;
       const n = Math.max(1, Math.floor(s.len / pitch));
-      const geo = new THREE.BoxGeometry(w, h - (lap ? 0.1 : 0.02), 0.017);
+      const ph = h - (lap ? 0.1 : 0.02);
+      const geo = new THREE.BoxGeometry(w, ph, 0.017);
       const mats = [];
       for (let i = 0; i < n; i++) {
-        const p = at(pitch * (i + 0.5));
-        mats.push(matAt(p.x, (h - (lap ? 0.1 : 0.02)) / 2, p.z, s.ang));
+        const t = pitch * (i + 0.5);
+        const p = at(t);
+        mats.push(matAt(p.x, baseOfT(t) + ph / 2, p.z, s.ang));
       }
       addInstanced(geo, M.paling, mats, true);
       if (lap) {
-        const mats2 = [];
-        for (let i = 0; i < n; i++) {
-          const t = pitch * (i + 1);
-          if (t < s.len) { const p = at(t); mats2.push(matAt(p.x, (h - 0.1) / 2, p.z + 0.0001, s.ang)); }
-        }
         // second layer sits proud of the first
         const geo2 = new THREE.BoxGeometry(w, h - 0.1, 0.017);
-        const off = mats2.map(m => { const e = m.clone(); const v = new THREE.Vector3(0, 0, 0.02).applyAxisAngle(new THREE.Vector3(0,1,0), -s.ang); e.setPosition(new THREE.Vector3().setFromMatrixPosition(m).add(v)); return e; });
+        const off = [];
+        for (let i = 0; i < n; i++) {
+          const t = pitch * (i + 1);
+          if (t < s.len) {
+            const p = at(t);
+            const v = new THREE.Vector3(0, 0, 0.02).applyAxisAngle(new THREE.Vector3(0, 1, 0), -s.ang);
+            off.push(matAt(p.x + v.x, baseOfT(t) + (h - 0.1) / 2, p.z + v.z, s.ang));
+          }
+        }
         addInstanced(geo2, M.paling2, off, true);
-        const cap = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.032, 0.07), M.cap);
-        const mid = at(s.len / 2);
-        cap.position.set(mid.x, h - 0.08, mid.z); cap.rotation.y = -s.ang; cap.castShadow = true;
-        fenceGroup.add(cap);
       }
     }
 
-    else if (state.type === 'colorbond') {
-      const lat = style === 'lattice';
-      const sheetH = h - 0.14;
-      const mid = at(s.len / 2);
-      const sheet = new THREE.Mesh(new THREE.BoxGeometry(s.len, sheetH, 0.016), M.steel);
-      sheet.position.set(mid.x, 0.07 + sheetH / 2, mid.z); sheet.rotation.y = -s.ang; sheet.castShadow = true;
-      fenceGroup.add(sheet);
-      for (const y of [0.06, h - 0.04]) {
-        const rail = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.075, 0.05), M.steel);
-        rail.position.set(mid.x, y, mid.z); rail.rotation.y = -s.ang; rail.castShadow = true;
-        fenceGroup.add(rail);
-      }
-      const ribGeo = new THREE.BoxGeometry(0.045, sheetH - 0.02, 0.034);
-      const ribs = [];
-      for (let t = 0.19; t < s.len; t += 0.19) {
-        const p = at(t);
-        ribs.push(matAt(p.x, 0.07 + sheetH / 2, p.z, s.ang));
-      }
-      addInstanced(ribGeo, M.steel, ribs);
-      if (lat) {
-        const latH = 0.45;
-        const tex = latticeTexture(state.colour.hex);
-        tex.repeat.set(Math.max(1, Math.round(s.len / 0.32)), 1.5);
-        const lm = new THREE.Mesh(new THREE.PlaneGeometry(s.len, latH),
-          new THREE.MeshLambertMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, alphaTest: 0.4 }));
-        lm.position.set(mid.x, h + latH / 2 - 0.02, mid.z); lm.rotation.y = -s.ang; lm.castShadow = true;
-        fenceGroup.add(lm);
-        const capr = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.05, 0.05), M.steel);
-        capr.position.set(mid.x, h + latH, mid.z); capr.rotation.y = -s.ang; capr.castShadow = true;
-        fenceGroup.add(capr);
-      }
-    }
-
-    else { // rural
-      const mid = at(s.len / 2);
+    else if (state.type === 'rural') { // rural always follows the ground
+      const mid = at(s.len / 2), runL = s.len / Math.cos(tilt), baseMid = (ya + yb) / 2;
       if (style === 'postrail') {
-        const nRails = 3;
-        for (let r = 0; r < nRails; r++) {
-          const y = h * (0.32 + 0.31 * r);
-          const rail = new THREE.Mesh(new THREE.BoxGeometry(s.len, 0.14, 0.045), M.rail);
-          rail.position.set(mid.x, Math.min(y, h - 0.07), mid.z); rail.rotation.y = -s.ang; rail.castShadow = true;
+        for (let r = 0; r < 3; r++) {
+          const y = Math.min(h * (0.32 + 0.31 * r), h - 0.07);
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(runL, 0.14, 0.045), M.rail);
+          rail.position.set(mid.x, baseMid + y, mid.z);
+          rail.rotation.set(0, -s.ang, tilt); rail.castShadow = true;
           fenceGroup.add(rail);
         }
       } else {
         for (let r = 0; r < 5; r++) {
           const y = 0.18 + (h - 0.3) * (r / 4);
-          const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, s.len, 5), M.wire);
-          wire.position.set(mid.x, y, mid.z);
-          wire.rotation.z = Math.PI / 2; wire.rotation.y = -s.ang;
+          const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, runL, 5), M.wire);
+          wire.position.set(mid.x, baseMid + y, mid.z);
+          wire.rotation.set(0, -s.ang, Math.PI / 2 + tilt);
           fenceGroup.add(wire);
         }
       }
     }
   }
 
-  // posts
-  if (state.type === 'rural') {
-    const g = new THREE.CylinderGeometry(0.085, 0.095, h + 0.05, 10);
-    addInstanced(g, M.post, postMats.map(o => matAt(o.p.x, (h + 0.05) / 2, o.p.z, o.ang)));
-  } else if (state.type === 'colorbond') {
-    const g = new THREE.BoxGeometry(0.07, h + 0.02, 0.07);
-    addInstanced(g, M.steel, postMats.map(o => matAt(o.p.x, (h + 0.02) / 2, o.p.z, o.ang)));
-  } else {
-    const g = new THREE.BoxGeometry(0.1, h + 0.06, 0.1);
-    addInstanced(g, M.post, postMats.map(o => matAt(o.p.x, (h + 0.06) / 2, o.p.z, o.ang)), true);
+  // posts — unit-height geometry scaled per post so each follows its own ground
+  const postGeo = state.type === 'rural' ? new THREE.CylinderGeometry(0.085, 0.095, 1, 10)
+    : state.type === 'colorbond' ? new THREE.BoxGeometry(0.07, 1, 0.07)
+    : new THREE.BoxGeometry(0.1, 1, 0.1);
+  const pm = postMats.map(o => {
+    const top = o.top + (state.type === 'timber' ? 0.06 : state.type === 'rural' ? 0.05 : 0.02);
+    const hgt = top - o.bot;
+    dummy.position.set(o.p.x, o.bot + hgt / 2, o.p.z);
+    dummy.rotation.set(0, -o.ang, 0);
+    dummy.scale.set(1, hgt, 1);
+    dummy.updateMatrix();
+    return dummy.matrix.clone();
+  });
+  addInstanced(postGeo, state.type === 'colorbond' ? M.steel : M.post, pm, state.type === 'timber');
+
+  // sloped terrain ribbon under the fence line, so the elevation reads visually
+  if (anySlope()) {
+    for (const s of list) {
+      const ya = s.a.y || 0, yb = s.b.y || 0;
+      const tilt = Math.atan2(yb - ya, s.len);
+      const g = new THREE.Mesh(new THREE.BoxGeometry(s.len / Math.cos(tilt) + 3, 0.06, 8), M.turf);
+      g.position.set((s.a.x + s.b.x) / 2, (ya + yb) / 2, (s.a.z + s.b.z) / 2);
+      g.rotation.set(0, -s.ang, tilt);
+      g.receiveShadow = true;
+      fenceGroup.add(g);
+    }
+    for (const p of state.points) {
+      const d = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.06, 24), M.turf);
+      d.position.set(p.x, p.y || 0, p.z);
+      d.receiveShadow = true;
+      fenceGroup.add(d);
+    }
   }
 }
 
@@ -540,10 +634,13 @@ function frameFence() {
   const pts = state.points;
   if (!pts.length) return;
   const box = new THREE.Box3();
-  pts.forEach(p => box.expandByPoint(new THREE.Vector3(p.x, 0, p.z)));
-  box.expandByPoint(box.min.clone().setY(0)); box.expandByPoint(box.max.clone().setY(parseFloat(state.height)));
+  const h = parseFloat(state.height);
+  pts.forEach(p => {
+    box.expandByPoint(new THREE.Vector3(p.x, p.y || 0, p.z));
+    box.expandByPoint(new THREE.Vector3(p.x, (p.y || 0) + h, p.z));
+  });
   const c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
-  orbit.target.copy(c).setY(parseFloat(state.height) * 0.45);
+  orbit.target.copy(c);
   orbit.radius = Math.max(8, Math.max(sz.x, sz.z) * 0.85 + 7);
   applyOrbit();
 }
@@ -670,7 +767,7 @@ renderer.domElement.addEventListener('pointermove', ev => {
     const g = toGround(ev);
     if (g) {
       const prev = state.points[gesture.idx - 1] || null;
-      state.points[gesture.idx] = snapped(g, prev);
+      state.points[gesture.idx] = { ...snapped(g, prev), y: state.points[gesture.idx].y || 0 };
       refresh(true);
     }
     return;
@@ -689,7 +786,8 @@ function endPointer(ev) {
   if (gesture.mode === 'tap' && state.step === 0) {
     const g = toGround(ev);
     if (g && state.points.length < 24) {
-      state.points.push(snapped(g, state.points[state.points.length - 1]));
+      const prev = state.points[state.points.length - 1];
+      state.points.push({ ...snapped(g, prev), y: prev ? (prev.y || 0) : 0 });
       refresh();
     }
   } else if (gesture.mode === 'dragpt') {
@@ -717,8 +815,9 @@ function estimate() {
   const st = STYLES[state.type].find(s => s.id === state.styleId);
   if (!L || !st) return null;
   const f = H_FACTOR[state.height] || 1;
+  const sl = SLEEPERS[state.sleepers].rate;
   const r = x => Math.round(x / 50) * 50;
-  return { low: r(L * st.rate[0] * f), high: r(L * st.rate[1] * f) };
+  return { low: r(L * (st.rate[0] * f + sl[0])), high: r(L * (st.rate[1] * f + sl[1])) };
 }
 
 /* ═══════════════ UI ═══════════════ */
@@ -738,6 +837,10 @@ function renderSidebar() {
        <span class="t">${s.label}</span><span class="d">${s.desc}</span></button>`).join('');
   $('heightChips').innerHTML = HEIGHTS.map(h =>
     `<button class="chip ${state.height === h ? 'sel' : ''}" data-h="${h}">${h} m</button>`).join('');
+  $('slopeChips').innerHTML = [['raked', 'Raked'], ['stepped', 'Stepped']].map(([id, l]) =>
+    `<button class="chip ${state.slopeMode === id ? 'sel' : ''}" data-slope="${id}">${l}</button>`).join('');
+  $('sleeperChips').innerHTML = SLEEPERS.map((s, i) =>
+    `<button class="chip ${state.sleepers === i ? 'sel' : ''}" data-sleep="${i}">${s.label}</button>`).join('');
   $('colourWrap').style.display = state.type === 'colorbond' ? '' : 'none';
   $('swatches').innerHTML = COLOURS.map((c, i) =>
     `<button class="sw ${state.colour === c ? 'sel' : ''}" data-c="${i}" title="${c.name}"
@@ -748,9 +851,12 @@ function renderSidebar() {
 function renderSegList() {
   const list = segs();
   $('segEmpty').style.display = list.length ? 'none' : '';
-  $('segList').innerHTML = list.map((s, i) =>
-    `<div class="segrow"><span class="nm">Side ${i + 1}</span>
-       <input type="number" min="0.5" step="0.1" value="${s.len.toFixed(1)}" data-seg="${i}"><span class="u">m</span></div>`).join('');
+  $('segList').innerHTML = list.map((s, i) => {
+    const rise = (s.b.y || 0) - (s.a.y || 0);
+    return `<div class="segrow"><span class="nm">Side ${i + 1}</span>
+       <input type="number" min="0.5" step="0.1" value="${s.len.toFixed(1)}" data-seg="${i}"><span class="u">m</span>
+       <input type="number" step="0.1" value="${rise.toFixed(1)}" data-rise="${i}" title="Rise (+) or fall (−) over this side, in metres"><span class="u">&#8597;m</span></div>`;
+  }).join('');
 }
 
 function renderSummary() {
@@ -761,6 +867,8 @@ function renderSummary() {
     <dt>Fence</dt><dd>${TYPES[state.type].label} — ${st.label}</dd>
     <dt>Height</dt><dd>${state.height} m</dd>
     ${state.type === 'colorbond' ? `<dt>Colour</dt><dd>${state.colour.name}</dd>` : ''}
+    ${anySlope() ? `<dt>Slope</dt><dd>${state.type === 'rural' ? 'Follows ground' : state.slopeMode === 'stepped' ? 'Stepped' : 'Raked'}</dd>` : ''}
+    ${state.sleepers ? `<dt>Sleepers</dt><dd>${SLEEPERS[state.sleepers].label}</dd>` : ''}
     ${e ? `<dt>Indicative range</dt><dd style="color:var(--color-accent)">${fmt(e.low)} – ${fmt(e.high)}</dd>` : ''}
   </dl>`;
 }
@@ -786,6 +894,7 @@ function renderStep() {
     ? 'Tap to place corners · drag to pan · pinch or scroll to zoom'
     : 'Drag to orbit · pinch or scroll to zoom · two-finger or right-drag to pan';
   grid.visible = state.step === 0;
+  if (state.step === 0) ground.position.y = 0;
   drawGroup.visible = state.step === 0;
   fenceGroup.visible = state.step !== 0;
   activeCam = state.step === 0 ? orthoCam : perspCam;
@@ -805,10 +914,12 @@ function refresh(light) {
 function updateLabels() {
   const list = segs();
   let html = '';
-  const y = state.step === 0 ? 0 : parseFloat(state.height) + 0.35;
   list.forEach(s => {
+    const y = state.step === 0 ? 0 : Math.max(s.a.y || 0, s.b.y || 0) + parseFloat(state.height) + 0.35;
+    const rise = (s.b.y || 0) - (s.a.y || 0);
+    const txt = s.len.toFixed(1) + ' m' + (Math.abs(rise) > 0.05 ? ` · ${rise > 0 ? '&#8599;' : '&#8600;'} ${Math.abs(rise).toFixed(1)} m` : '');
     const p = screenPos((s.a.x + s.b.x) / 2, y, (s.a.z + s.b.z) / 2);
-    if (!p.behind) html += `<div class="mlabel" style="left:${p.x}px;top:${p.y}px">${s.len.toFixed(1)} m</div>`;
+    if (!p.behind) html += `<div class="mlabel" style="left:${p.x}px;top:${p.y}px">${txt}</div>`;
   });
   if (state.step === 0 && state.cursor && state.points.length && state.dragIdx === -1) {
     const last = state.points[state.points.length - 1];
@@ -829,12 +940,23 @@ document.querySelector('aside').addEventListener('click', ev => {
   else if (b.dataset.style) { state.styleId = b.dataset.style; renderSidebar(); refresh(); }
   else if (b.dataset.h) { state.height = b.dataset.h; renderSidebar(); refresh(); if (state.step !== 0) frameFence(); }
   else if (b.dataset.c) { state.colour = COLOURS[+b.dataset.c]; renderSidebar(); refresh(); }
+  else if (b.dataset.slope) { state.slopeMode = b.dataset.slope; renderSidebar(); refresh(); }
+  else if (b.dataset.sleep) { state.sleepers = +b.dataset.sleep; renderSidebar(); refresh(); }
   else if (b.dataset.preset) { preset(b.dataset.preset); }
   else if (b.id === 'undoBtn') { state.points.pop(); refresh(); }
   else if (b.id === 'clearBtn') { state.points = []; refresh(); }
   else if (b.id === 'sendBtn') { sendToQuote(); }
 });
 document.querySelector('aside').addEventListener('change', ev => {
+  const r = ev.target.closest('input[data-rise]');
+  if (r) {
+    const idx = +r.dataset.rise, nv = parseFloat(r.value) || 0;
+    const old = (state.points[idx + 1].y || 0) - (state.points[idx].y || 0);
+    const d = nv - old;
+    for (let j = idx + 1; j < state.points.length; j++) state.points[j].y = (state.points[j].y || 0) + d;
+    refresh();
+    return;
+  }
   const i = ev.target.closest('input[data-seg]');
   if (!i) return;
   const idx = +i.dataset.seg, nl = Math.max(0.5, parseFloat(i.value) || 0.5);
@@ -902,7 +1024,9 @@ function sendToQuote() {
     localStorage.setItem('jrcMeasurePrefill', JSON.stringify({
       type: state.type, style: state.styleId, height: state.height,
       length: Math.round(totalLen()),
-      colour: state.type === 'colorbond' ? state.colour.name : null
+      colour: state.type === 'colorbond' ? state.colour.name : null,
+      slope: anySlope() ? state.slopeMode : null,
+      sleepers: state.sleepers
     }));
   } catch (e) {}
   location.href = '/#quote';
